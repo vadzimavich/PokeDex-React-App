@@ -4,12 +4,27 @@ import Main from './components/Main/Main';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import './App.css';
 
-class App extends Component {
+interface AppState {
+  searchTerm: string;
+}
+
+class App extends Component<object, AppState> {
+  constructor(props: object) {
+    super(props);
+    this.state = {
+      searchTerm: '',
+    };
+  }
+
+  handleSearch = (term: string) => {
+    this.setState({ searchTerm: term });
+  };
+
   render() {
     return (
       <ErrorBoundary>
         <div className="app">
-          <Header />
+          <Header onSearch={this.handleSearch} />
           <Main />
         </div>
       </ErrorBoundary>

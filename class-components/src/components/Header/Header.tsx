@@ -1,8 +1,18 @@
 import { Component } from 'react';
+import Search from '../Search/Search';
 
-class Header extends Component {
+interface HeaderProps {
+  onSearch: (searchTerm: string) => void;
+}
+
+class Header extends Component<HeaderProps> {
   render() {
-    return <header>Header Section</header>;
+    return (
+      <header className="header">
+        {}
+        <Search onSearch={this.props.onSearch} />
+      </header>
+    );
   }
 }
 
