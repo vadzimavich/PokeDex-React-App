@@ -2,6 +2,7 @@ import { Component } from 'react';
 import Header from './components/Header/Header';
 import Main from './components/Main/Main';
 import Pagination from './components/Pagination/Pagination';
+import ErrorButton from './components/ErrorButton/ErrorButton';
 import type { PokemonDetails } from './types';
 import './App.css';
 
@@ -10,7 +11,6 @@ interface AppState {
   pokemons: PokemonDetails[];
   isLoading: boolean;
   error: Error | null;
-  shouldThrowError: boolean;
   nextPageUrl: string | null;
   prevPageUrl: string | null;
   currentPage: number;
@@ -28,7 +28,6 @@ class App extends Component<object, AppState> {
       pokemons: [],
       isLoading: false,
       error: null,
-      shouldThrowError: false,
       nextPageUrl: null,
       prevPageUrl: null,
       currentPage: 1,
@@ -130,10 +129,6 @@ class App extends Component<object, AppState> {
     this.setState({ searchTerm: term }, this.fetchPokemons);
   };
 
-  triggerError = () => {
-    this.setState({ shouldThrowError: true });
-  };
-
   render() {
     const {
       pokemons,
@@ -172,9 +167,7 @@ class App extends Component<object, AppState> {
             totalPages={totalPages}
           />
         )}
-        <button onClick={this.triggerError} className="error-button">
-          Throw Error
-        </button>
+        <ErrorButton />
       </div>
     );
   }
