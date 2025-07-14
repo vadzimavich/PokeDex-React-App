@@ -1,8 +1,7 @@
 import { Component } from 'react';
 import Header from './components/Header/Header';
 import Main from './components/Main/Main';
-import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
-import { type Pokemon } from './types';
+import type { Pokemon } from './types';
 import './App.css';
 
 interface AppState {
@@ -10,6 +9,7 @@ interface AppState {
   pokemons: Pokemon[];
   isLoading: boolean;
   error: Error | null;
+  shouldThrowError: boolean;
 }
 
 const SEARCH_TERM_KEY = 'searchTerm';
@@ -22,6 +22,7 @@ class App extends Component<object, AppState> {
       pokemons: [],
       isLoading: false,
       error: null,
+      shouldThrowError: false,
     };
   }
 
@@ -72,15 +73,25 @@ class App extends Component<object, AppState> {
     });
   };
 
+  triggerError = () => {
+    this.setState({ shouldThrowError: true });
+  };
+
   render() {
+    if (this.state.shouldThrowError) {
+      throw new Error('This is a test error!');
+    }
+
     const { pokemons, isLoading, error, searchTerm } = this.state;
+
     return (
-      <ErrorBoundary>
-        <div className="app">
-          <Header onSearch={this.handleSearch} searchTerm={searchTerm} />
-          <Main pokemons={pokemons} isLoading={isLoading} error={error} />
-        </div>
-      </ErrorBoundary>
+      <div className="app">
+        <Header onSearch={this.handleSearch} searchTerm={searchTerm} />
+        <Main pokemons={pokemons} isLoading={isLoading} error={error} />
+        <button onClick={this.triggerError} className="error-button">
+          Throw Error
+        </button>
+      </div>
     );
   }
 }
