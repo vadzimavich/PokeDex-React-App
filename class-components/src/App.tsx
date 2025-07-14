@@ -39,6 +39,15 @@ class App extends Component<object, AppState> {
     this.fetchPokemons();
   }
 
+  componentDidUpdate(_: object, prevState: AppState) {
+    if (prevState.currentPage !== this.state.currentPage) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+  }
+
   getPokemonDetails = async (url: string): Promise<PokemonDetails> => {
     const detailsRes = await fetch(url);
     if (!detailsRes.ok) throw new Error('Failed to fetch pokemon details...');
