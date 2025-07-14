@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import Header from './components/Header/Header';
 import Main from './components/Main/Main';
+import Pagination from './components/Pagination/Pagination';
 import type { PokemonDetails } from './types';
 import './App.css';
 
@@ -10,9 +11,14 @@ interface AppState {
   isLoading: boolean;
   error: Error | null;
   shouldThrowError: boolean;
+  nextPageUrl: string | null;
+  prevPageUrl: string | null;
+  currentPage: number;
+  totalPages: number;
 }
 
 const SEARCH_TERM_KEY = 'searchTerm';
+const POKEMON_PER_PAGE = 20;
 
 class App extends Component<object, AppState> {
   constructor(props: object) {
@@ -23,6 +29,10 @@ class App extends Component<object, AppState> {
       isLoading: false,
       error: null,
       shouldThrowError: false,
+      nextPageUrl: null,
+      prevPageUrl: null,
+      currentPage: 1,
+      totalPages: 0,
     };
   }
 
@@ -55,34 +65,63 @@ class App extends Component<object, AppState> {
     this.setState({ isLoading: true, error: null });
 
     if (searchTerm) {
+      this.setState({
+        nextPageUrl: null,
+        prevPageUrl: null,
+        currentPage: 1,
+        totalPages: 0,
+      });
       const url = `https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`;
       this.getPokemonDetails(url)
-        .then((pokemon) => {
-          this.setState({ pokemons: [pokemon] });
-        })
-        .catch((_) => {
+        .then((pokemon) => this.setState({ pokemons: [pokemon] }))
+        .catch((_) =>
           this.setState({
             error: new Error(`Pokemon "${searchTerm}" not found.`),
             pokemons: [],
-          });
-        })
-        .finally(() => {
-          this.setState({ isLoading: false });
-        });
+          })
+        )
+        .finally(() => this.setState({ isLoading: false }));
     } else {
-      fetch('https://pokeapi.co/api/v2/pokemon?limit=20')
-        .then((res) => res.json())
-        .then(async (data) => {
-          const pokemonPromises = data.results.map((p: { url: string }) =>
-            this.getPokemonDetails(p.url)
-          );
-          const detailedPokemons = await Promise.all(pokemonPromises);
-          this.setState({ pokemons: detailedPokemons });
-        })
-        .catch((error) => this.setState({ error, pokemons: [] }))
-        .finally(() => {
-          this.setState({ isLoading: false });
+      const initialUrl = `https://pokeapi.co/api/v2/pokemon?limit=${POKEMON_PER_PAGE}`;
+      this.fetchAllPokemons(initialUrl);
+    }
+  };
+
+  fetchAllPokemons = (url: string) => {
+    this.setState({ isLoading: true, error: null });
+    fetch(url)
+      .then((res) => res.json())
+      .then(async (data) => {
+        const { results, next, previous, count } = data;
+        const offsetMatch = url.match(/offset=(\d+)/);
+        const currentOffset = offsetMatch ? parseInt(offsetMatch[1], 10) : 0;
+
+        const pokemonPromises = results.map((p: { url: string }) =>
+          this.getPokemonDetails(p.url)
+        );
+        const detailedPokemons = await Promise.all(pokemonPromises);
+
+        this.setState({
+          pokemons: detailedPokemons,
+          nextPageUrl: next,
+          prevPageUrl: previous,
+          totalPages: Math.ceil(count / POKEMON_PER_PAGE),
+          currentPage: currentOffset / POKEMON_PER_PAGE + 1,
         });
+      })
+      .catch((error) => this.setState({ error, pokemons: [] }))
+      .finally(() => this.setState({ isLoading: false }));
+  };
+
+  handleNextPage = () => {
+    if (this.state.nextPageUrl) {
+      this.fetchAllPokemons(this.state.nextPageUrl);
+    }
+  };
+
+  handlePrevPage = () => {
+    if (this.state.prevPageUrl) {
+      this.fetchAllPokemons(this.state.prevPageUrl);
     }
   };
 
@@ -96,16 +135,43 @@ class App extends Component<object, AppState> {
   };
 
   render() {
-    if (this.state.shouldThrowError) {
-      throw new Error('This is a test error!');
-    }
+    const {
+      pokemons,
+      isLoading,
+      error,
+      searchTerm,
+      nextPageUrl,
+      prevPageUrl,
+      currentPage,
+      totalPages,
+    } = this.state;
 
-    const { pokemons, isLoading, error, searchTerm } = this.state;
+    const showPagination = !searchTerm && !isLoading && pokemons.length > 0;
 
     return (
       <div className="app">
         <Header onSearch={this.handleSearch} searchTerm={searchTerm} />
+        {showPagination && (
+          <Pagination
+            onNext={this.handleNextPage}
+            onPrev={this.handlePrevPage}
+            hasNext={!!nextPageUrl}
+            hasPrev={!!prevPageUrl}
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
+        )}
         <Main pokemons={pokemons} isLoading={isLoading} error={error} />
+        {showPagination && (
+          <Pagination
+            onNext={this.handleNextPage}
+            onPrev={this.handlePrevPage}
+            hasNext={!!nextPageUrl}
+            hasPrev={!!prevPageUrl}
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
+        )}
         <button onClick={this.triggerError} className="error-button">
           Throw Error
         </button>
