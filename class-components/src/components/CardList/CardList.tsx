@@ -1,8 +1,25 @@
 import { Component } from 'react';
+import type { Pokemon } from '../../types';
 
-class CardList extends Component {
+interface CardListProps {
+  pokemons: Pokemon[];
+}
+
+class CardList extends Component<CardListProps> {
   render() {
-    return <div>CardList Component</div>;
+    const { pokemons } = this.props;
+
+    if (pokemons.length === 0) {
+      return <div>No Pokemon found.</div>;
+    }
+
+    return (
+      <ul>
+        {pokemons.map((pokemon) => (
+          <li key={pokemon.name}>{pokemon.name}</li>
+        ))}
+      </ul>
+    );
   }
 }
 
