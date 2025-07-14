@@ -1,9 +1,9 @@
 import { Component } from 'react';
 import CardList from '../CardList/CardList';
-import type { Pokemon } from '../../types';
+import type { PokemonDetails } from '../../types';
 
 interface MainProps {
-  pokemons: Pokemon[];
+  pokemons: PokemonDetails[];
   isLoading: boolean;
   error: Error | null;
 }

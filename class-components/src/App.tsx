@@ -1,12 +1,12 @@
 import { Component } from 'react';
 import Header from './components/Header/Header';
 import Main from './components/Main/Main';
-import type { Pokemon } from './types';
+import type { PokemonDetails } from './types';
 import './App.css';
 
 interface AppState {
   searchTerm: string;
-  pokemons: Pokemon[];
+  pokemons: PokemonDetails[];
   isLoading: boolean;
   error: Error | null;
   shouldThrowError: boolean;
@@ -30,47 +30,65 @@ class App extends Component<object, AppState> {
     this.fetchPokemons();
   }
 
+  getPokemonDetails = async (url: string): Promise<PokemonDetails> => {
+    const detailsRes = await fetch(url);
+    if (!detailsRes.ok) throw new Error('Failed to fetch pokemon details...');
+    const details = await detailsRes.json();
+
+    const speciesRes = await fetch(details.species.url);
+    if (!speciesRes.ok) throw new Error('Failed to fetch pokemon species...');
+    const speciesData = await speciesRes.json();
+
+    const descriptionEntry = speciesData.flavor_text_entries.find(
+      (entry: { language: { name: string } }) => entry.language.name === 'en'
+    );
+
+    const description = descriptionEntry
+      ? descriptionEntry.flavor_text.replace(/[\n\f\r]/g, ' ')
+      : 'No description available...';
+
+    return { ...details, description };
+  };
+
   fetchPokemons = () => {
     const { searchTerm } = this.state;
     this.setState({ isLoading: true, error: null });
-    const endpoint = searchTerm
-      ? `https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`
-      : 'https://pokeapi.co/api/v2/pokemon?limit=30';
 
-    fetch(endpoint)
-      .then((res) => {
-        if (!res.ok) {
-          if (res.status === 404) {
-            throw new Error(`Sorry, Pokemon "${searchTerm}" not found`);
-          }
-          throw new Error('Failed to fetch');
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (searchTerm) {
-          const foundPokemon: Pokemon = {
-            name: data.name,
-            url: `https://pokeapi.co/api/v2/pokemon/${data.id}/`,
-          };
-          this.setState({ pokemons: [foundPokemon] });
-        } else {
-          this.setState({ pokemons: data.results });
-        }
-      })
-      .catch((error) => {
-        this.setState({ error, pokemons: [] });
-      })
-      .finally(() => {
-        this.setState({ isLoading: false });
-      });
+    if (searchTerm) {
+      const url = `https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`;
+      this.getPokemonDetails(url)
+        .then((pokemon) => {
+          this.setState({ pokemons: [pokemon] });
+        })
+        .catch((_) => {
+          this.setState({
+            error: new Error(`Pokemon "${searchTerm}" not found.`),
+            pokemons: [],
+          });
+        })
+        .finally(() => {
+          this.setState({ isLoading: false });
+        });
+    } else {
+      fetch('https://pokeapi.co/api/v2/pokemon?limit=20')
+        .then((res) => res.json())
+        .then(async (data) => {
+          const pokemonPromises = data.results.map((p: { url: string }) =>
+            this.getPokemonDetails(p.url)
+          );
+          const detailedPokemons = await Promise.all(pokemonPromises);
+          this.setState({ pokemons: detailedPokemons });
+        })
+        .catch((error) => this.setState({ error, pokemons: [] }))
+        .finally(() => {
+          this.setState({ isLoading: false });
+        });
+    }
   };
 
   handleSearch = (term: string) => {
     localStorage.setItem(SEARCH_TERM_KEY, term);
-    this.setState({ searchTerm: term }, () => {
-      this.fetchPokemons();
-    });
+    this.setState({ searchTerm: term }, this.fetchPokemons);
   };
 
   triggerError = () => {

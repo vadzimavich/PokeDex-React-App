@@ -1,8 +1,10 @@
 import { Component } from 'react';
-import type { Pokemon } from '../../types';
+import type { PokemonDetails } from '../../types';
+import Card from '../Card/Card';
+import styles from './CardList.module.css';
 
 interface CardListProps {
-  pokemons: Pokemon[];
+  pokemons: PokemonDetails[];
 }
 
 class CardList extends Component<CardListProps> {
@@ -14,11 +16,11 @@ class CardList extends Component<CardListProps> {
     }
 
     return (
-      <ul>
+      <div className={styles.cardList}>
         {pokemons.map((pokemon) => (
-          <li key={pokemon.name}>{pokemon.name}</li>
+          <Card key={pokemon.id} pokemon={pokemon} />
         ))}
-      </ul>
+      </div>
     );
   }
 }

@@ -1,0 +1,108 @@
+.card {
+  background-color: #2c2c2c;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  text-transform: capitalize;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.imageContainer {
+  background-color: #444;
+  padding: 1rem;
+  position: relative;
+}
+
+.idLabel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.name {
+  margin: 0 0 0.75rem;
+  font-size: 1.5rem;
+  order: 1;
+}
+
+.description {
+  font-size: 0.9rem;
+  color: #ddd;
+  margin: 0 0 1rem;
+  line-height: 1.4;
+  flex-grow: 1;
+  order: 2;
+  text-transform: none;
+}
+
+.details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #ccc;
+  order: 3;
+}
+
+.types {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+  order: 4;
+}
+
+.type {
+  padding: 0.25rem 0.75rem;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.unit {
+  text-transform: none;
+}
+
+.grass { background-color: #78C850; }
+.fire { background-color: #F08030; }
+.water { background-color: #6890F0; }
+.bug { background-color: #A8B820; }
+.normal { background-color: #A8A878; }
+.poison { background-color: #A040A0; }
+.electric { background-color: #F8D030; }
+.ground { background-color: #E0C068; }
+.fairy { background-color: #EE99AC; }
+.fighting { background-color: #C03028; }
+.psychic { background-color: #F85888; }
+.rock { background-color: #B8A038; }
+.ghost { background-color: #705898; }
+.ice { background-color: #98D8D8; }
+.dragon { background-color: #7038F8; }
+.dark { background-color: #705848; }
+.steel { background-color: #B8B8D0; }
+.flying { background-color: #A890F0; }
