@@ -2,6 +2,7 @@ import { Component } from 'react';
 
 interface SearchProps {
   onSearch: (searchTerm: string) => void;
+  initialValue: string;
 }
 
 interface SearchState {
@@ -12,7 +13,7 @@ class Search extends Component<SearchProps, SearchState> {
   constructor(props: SearchProps) {
     super(props);
     this.state = {
-      inputValue: '',
+      inputValue: this.props.initialValue,
     };
   }
 
