@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
-import { server } from './mocks/server';
+import { server } from './__tests__/server';
 
 Object.defineProperty(window, 'scrollTo', {
   value: vi.fn(),

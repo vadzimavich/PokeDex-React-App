@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
 
 import App from './App';
-import { server } from './mocks/server';
+import { server } from './__tests__/server';
 
 describe('App Component Integration Tests', () => {
   const user = userEvent.setup();
