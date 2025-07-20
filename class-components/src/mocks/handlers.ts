@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse, delay } from 'msw';
 
 const mockPokemonList = {
   count: 1302,
@@ -32,23 +32,30 @@ const mockSpeciesDetails = (name: string) => ({
 });
 
 export const handlers = [
-  http.get('https://pokeapi.co/api/v2/pokemon', () => {
+  http.get('https://pokeapi.co/api/v2/pokemon', async () => {
+    await delay(150);
     return HttpResponse.json(mockPokemonList);
   }),
 
-  http.get('https://pokeapi.co/api/v2/pokemon/bulbasaur', () => {
+  http.get('https://pokeapi.co/api/v2/pokemon/bulbasaur', async () => {
+    await delay(150);
     return HttpResponse.json(mockPokemonDetails(1, 'bulbasaur'));
   }),
 
-  http.get('https://pokeapi.co/api/v2/pokemon/:id/', ({ params }) => {
+  http.get('https://pokeapi.co/api/v2/pokemon/:id/', async ({ params }) => {
+    await delay(150);
     const id = parseInt(params.id as string, 10);
     const name = id === 1 ? 'bulbasaur' : 'ivysaur';
     return HttpResponse.json(mockPokemonDetails(id, name));
   }),
 
-  http.get('https://pokeapi.co/api/v2/pokemon-species/:id/', ({ params }) => {
-    const id = parseInt(params.id as string, 10);
-    const name = id === 1 ? 'bulbasaur' : 'ivysaur';
-    return HttpResponse.json(mockSpeciesDetails(name));
-  }),
+  http.get(
+    'https://pokeapi.co/api/v2/pokemon-species/:id/',
+    async ({ params }) => {
+      await delay(150);
+      const id = parseInt(params.id as string, 10);
+      const name = id === 1 ? 'bulbasaur' : 'ivysaur';
+      return HttpResponse.json(mockSpeciesDetails(name));
+    }
+  ),
 ];
