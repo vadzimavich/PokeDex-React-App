@@ -4,7 +4,7 @@ import styles from './SkeletonCard.module.css';
 class SkeletonCard extends Component {
   render() {
     return (
-      <div className={styles.card}>
+      <div className={styles.card} data-testid="skeleton-card">
         <div className={styles.image}></div>
         <div className={styles.info}>
           <div className={styles.line}></div>
