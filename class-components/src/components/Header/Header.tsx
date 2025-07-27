@@ -2,13 +2,13 @@ import Search from '../Search/Search';
 
 interface HeaderProps {
   onSearch: (searchTerm: string) => void;
-  searchTerm: string;
+  initialValue: string;
 }
 
-const Header = ({ onSearch, searchTerm }: HeaderProps) => {
+const Header = ({ onSearch, initialValue }: HeaderProps) => {
   return (
     <header className="header">
-      <Search onSearch={onSearch} initialValue={searchTerm} />
+      <Search onSearch={onSearch} initialValue={initialValue} />
     </header>
   );
 };
