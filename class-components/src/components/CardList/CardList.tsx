@@ -4,9 +4,10 @@ import styles from './CardList.module.css';
 
 interface CardListProps {
   pokemons: PokemonDetails[];
+  onCardClick: (id: number) => void;
 }
 
-const CardList = ({ pokemons }: CardListProps) => {
+const CardList = ({ pokemons, onCardClick }: CardListProps) => {
   if (pokemons.length === 0) {
     return <div>No Pokemon found.</div>;
   }
@@ -14,7 +15,7 @@ const CardList = ({ pokemons }: CardListProps) => {
   return (
     <div className={styles.cardList}>
       {pokemons.map((pokemon) => (
-        <Card key={pokemon.id} pokemon={pokemon} />
+        <Card key={pokemon.id} pokemon={pokemon} onCardClick={onCardClick} />
       ))}
     </div>
   );

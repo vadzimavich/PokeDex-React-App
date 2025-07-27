@@ -5,6 +5,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import Main from '../components/Main/Main';
 import Pagination from '../components/Pagination/Pagination';
 import Header from '../components/Header/Header';
+import PokemonDetailView from '../components/PokemonDetailView/PokemonDetailView';
 import type { PokemonDetails } from '../types';
 
 const POKEMON_PER_PAGE = 20;
@@ -21,6 +22,7 @@ const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const detailsId = searchParams.get('details');
 
   const getPokemonDetails = useCallback(
     async (url: string): Promise<PokemonDetails> => {
@@ -108,32 +110,52 @@ const HomePage = () => {
     }
   };
 
+  const handleCardClick = (id: number) => {
+    setSearchParams({ page: currentPage.toString(), details: id.toString() });
+  };
+
+  const closeDetails = () => {
+    setSearchParams({ page: currentPage.toString() });
+  };
+
   const showPagination = !searchTerm && !error;
 
   return (
     <>
       <Header onSearch={handleSearch} initialValue={searchTerm} />
-      {showPagination && (
-        <Pagination
-          onNext={() => handlePageChange(currentPage + 1)}
-          onPrev={() => handlePageChange(currentPage - 1)}
-          hasNext={!!nextPageUrl}
-          hasPrev={!!prevPageUrl}
-          currentPage={currentPage}
-          totalPages={totalPages}
-        />
-      )}
-      <Main pokemons={pokemons} isLoading={isLoading} error={error} />
-      {showPagination && (
-        <Pagination
-          onNext={() => handlePageChange(currentPage + 1)}
-          onPrev={() => handlePageChange(currentPage - 1)}
-          hasNext={!!nextPageUrl}
-          hasPrev={!!prevPageUrl}
-          currentPage={currentPage}
-          totalPages={totalPages}
-        />
-      )}
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {showPagination && (
+            <Pagination
+              onNext={() => handlePageChange(currentPage + 1)}
+              onPrev={() => handlePageChange(currentPage - 1)}
+              hasNext={!!nextPageUrl}
+              hasPrev={!!prevPageUrl}
+              currentPage={currentPage}
+              totalPages={totalPages}
+            />
+          )}
+          <Main
+            pokemons={pokemons}
+            isLoading={isLoading}
+            error={error}
+            onCardClick={handleCardClick}
+          />
+          {showPagination && (
+            <Pagination
+              onNext={() => handlePageChange(currentPage + 1)}
+              onPrev={() => handlePageChange(currentPage - 1)}
+              hasNext={!!nextPageUrl}
+              hasPrev={!!prevPageUrl}
+              currentPage={currentPage}
+              totalPages={totalPages}
+            />
+          )}
+        </div>
+        {detailsId && (
+          <PokemonDetailView pokemonId={detailsId} onClose={closeDetails} />
+        )}
+      </div>
     </>
   );
 };
