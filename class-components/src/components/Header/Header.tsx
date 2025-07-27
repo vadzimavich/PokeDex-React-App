@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import Search from '../Search/Search';
 
 interface HeaderProps {
@@ -6,17 +5,12 @@ interface HeaderProps {
   searchTerm: string;
 }
 
-class Header extends Component<HeaderProps> {
-  render() {
-    return (
-      <header className="header">
-        <Search
-          onSearch={this.props.onSearch}
-          initialValue={this.props.searchTerm}
-        />
-      </header>
-    );
-  }
-}
+const Header = ({ onSearch, searchTerm }: HeaderProps) => {
+  return (
+    <header className="header">
+      <Search onSearch={onSearch} initialValue={searchTerm} />
+    </header>
+  );
+};
 
 export default Header;
