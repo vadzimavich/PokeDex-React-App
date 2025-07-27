@@ -1,3 +1,9 @@
+import { fetch, Headers, Request, Response } from 'undici';
+
+Object.assign(globalThis, { fetch, Headers, Request, Response });
+
+/// <reference types="vitest/globals" />
+
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import { server } from './__tests__/server';

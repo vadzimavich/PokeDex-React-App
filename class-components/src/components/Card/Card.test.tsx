@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
 import Card from './Card';
 import type { PokemonDetails } from '../../types';
 
@@ -20,10 +20,12 @@ describe('Card Component', () => {
     types: [{ type: { name: 'grass' } }, { type: { name: 'poison' } }],
     description: 'A strange seed was planted on its back at birth.',
     species: { url: '' },
+    stats: [],
+    abilities: [],
   };
 
   it('should render all pokemon details correctly', () => {
-    render(<Card pokemon={mockPokemon} />);
+    render(<Card pokemon={mockPokemon} onCardClick={() => {}} />);
 
     // check pokemon name
     expect(screen.getByText(/bulbasaur/i)).toBeInTheDocument();
@@ -46,5 +48,21 @@ describe('Card Component', () => {
     // check types
     expect(screen.getByText('grass')).toBeInTheDocument();
     expect(screen.getByText('poison')).toBeInTheDocument();
+  });
+
+  it('should call onCardClick with pokemon id when clicked', async () => {
+    const onCardClickMock = vi.fn();
+    render(<Card pokemon={mockPokemon} onCardClick={onCardClickMock} />);
+
+    const cardElement = screen
+      .getByText(/bulbasaur/i)
+      .closest('div[style*="cursor: pointer"]');
+    if (!cardElement) throw new Error('Card element not found');
+
+    await userEvent.click(cardElement);
+
+    expect(onCardClickMock).toHaveBeenCalledTimes(1);
+    // --- ИЗМЕНЕНИЕ: Проверяем вызов только с id ---
+    expect(onCardClickMock).toHaveBeenCalledWith(mockPokemon.id);
   });
 });

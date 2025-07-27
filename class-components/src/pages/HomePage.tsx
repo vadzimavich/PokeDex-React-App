@@ -1,11 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import {
+  useSearchParams,
+  useNavigate,
+  useLocation,
+  Outlet,
+  useOutlet,
+} from 'react-router-dom';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { getPokemonList, getPokemonFullDetails } from '../api/pokemonService';
 
 import Main from '../components/Main/Main';
 import Pagination from '../components/Pagination/Pagination';
 import Header from '../components/Header/Header';
-import PokemonDetailView from '../components/PokemonDetailView/PokemonDetailView';
 import type { PokemonDetails } from '../types';
 
 const POKEMON_PER_PAGE = 20;
@@ -21,73 +27,44 @@ const HomePage = () => {
   const [searchTerm, setSearchTerm] = useLocalStorage('searchTerm', '');
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const outlet = useOutlet();
+
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
-  const detailsId = searchParams.get('details');
 
-  const getPokemonDetails = useCallback(
-    async (url: string): Promise<PokemonDetails> => {
-      const detailsRes = await fetch(url);
-      if (!detailsRes.ok) throw new Error('Failed to fetch pokemon details');
-      const details = await detailsRes.json();
-      const speciesRes = await fetch(details.species.url);
-      if (!speciesRes.ok) throw new Error('Failed to fetch pokemon species');
-      const speciesData = await speciesRes.json();
-      const entry = speciesData.flavor_text_entries.find(
-        (e: { language: { name: string } }) => e.language.name === 'en'
-      );
-      const description = entry
-        ? entry.flavor_text.replace(/[\n\f\r]/g, ' ')
-        : 'No description.';
-      return { ...details, description };
-    },
-    []
-  );
+  const fetchPokemonsByUrl = useCallback(async (url: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { pokemons, next, previous, count } = await getPokemonList(url);
+      setPokemons(pokemons);
+      setNextPageUrl(next);
+      setPrevPageUrl(previous);
+      setTotalPages(Math.ceil(count / POKEMON_PER_PAGE));
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-  const fetchPokemonsByUrl = useCallback(
-    async (url: string) => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Network response was not ok');
-        const data = await res.json();
-        const { results, next, previous, count } = data;
-        const promises = results.map((p: { url: string }) =>
-          getPokemonDetails(p.url)
-        );
-        const detailedPokemons = await Promise.all(promises);
-        setPokemons(detailedPokemons);
-        setNextPageUrl(next);
-        setPrevPageUrl(previous);
-        setTotalPages(Math.ceil(count / POKEMON_PER_PAGE));
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [getPokemonDetails]
-  );
-
-  const fetchSinglePokemon = useCallback(
-    async (name: string) => {
-      setIsLoading(true);
-      setError(null);
-      setNextPageUrl(null);
-      setPrevPageUrl(null);
-      try {
-        const url = `https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`;
-        const pokemon = await getPokemonDetails(url);
-        setPokemons([pokemon]);
-      } catch (_) {
-        setError(new Error(`Pokemon "${name}" not found.`));
-        setPokemons([]);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [getPokemonDetails]
-  );
+  const fetchSinglePokemon = useCallback(async (name: string) => {
+    setIsLoading(true);
+    setError(null);
+    setNextPageUrl(null);
+    setPrevPageUrl(null);
+    try {
+      const pokemon = await getPokemonFullDetails(name.toLowerCase());
+      setPokemons([pokemon]);
+      setTotalPages(1);
+    } catch (err) {
+      setError(new Error(`Pokemon "${name}" not found.`));
+      setPokemons([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (searchTerm) {
@@ -101,21 +78,27 @@ const HomePage = () => {
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    setSearchParams({ page: '1' });
+    setSearchParams((prev) => {
+      prev.set('page', '1');
+      return prev;
+    });
   };
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
-      setSearchParams({ page: newPage.toString() });
+      setSearchParams((prev) => {
+        prev.set('page', newPage.toString());
+        return prev;
+      });
     }
   };
 
   const handleCardClick = (id: number) => {
-    setSearchParams({ page: currentPage.toString(), details: id.toString() });
+    navigate(`details/${id}${location.search}`);
   };
 
   const closeDetails = () => {
-    setSearchParams({ page: currentPage.toString() });
+    navigate(`/${location.search}`);
   };
 
   const showPagination = !searchTerm && !error;
@@ -124,23 +107,18 @@ const HomePage = () => {
     <>
       <Header onSearch={handleSearch} initialValue={searchTerm} />
       <div style={{ display: 'flex' }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {showPagination && (
-            <Pagination
-              onNext={() => handlePageChange(currentPage + 1)}
-              onPrev={() => handlePageChange(currentPage - 1)}
-              hasNext={!!nextPageUrl}
-              hasPrev={!!prevPageUrl}
-              currentPage={currentPage}
-              totalPages={totalPages}
-            />
-          )}
+        <div
+          style={{ flex: 1, minWidth: 0 }}
+          onClick={outlet ? closeDetails : undefined}
+          data-testid="main-panel"
+        >
           <Main
             pokemons={pokemons}
             isLoading={isLoading}
             error={error}
             onCardClick={handleCardClick}
           />
+
           {showPagination && (
             <Pagination
               onNext={() => handlePageChange(currentPage + 1)}
@@ -152,9 +130,7 @@ const HomePage = () => {
             />
           )}
         </div>
-        {detailsId && (
-          <PokemonDetailView pokemonId={detailsId} onClose={closeDetails} />
-        )}
+        <Outlet />
       </div>
     </>
   );

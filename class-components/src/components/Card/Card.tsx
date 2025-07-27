@@ -10,13 +10,21 @@ const Card = ({ pokemon, onCardClick }: CardProps) => {
   const imageUrl = pokemon.sprites.other['official-artwork'].front_default;
 
   return (
-    <div onClick={() => onCardClick(pokemon.id)} style={{ cursor: 'pointer' }}>
+    <div
+      onClick={(e) => {
+        e.stopPropagation(); // Оставляем stopPropagation здесь!
+        onCardClick(pokemon.id);
+      }}
+      style={{ cursor: 'pointer' }}
+    >
       <div className={styles.card}>
         <div className={styles.imageContainer}>
           <div className={styles.idLabel}>
             #{pokemon.id.toString().padStart(3, '0')}
           </div>
-          <img src={imageUrl} alt={pokemon.name} className={styles.image} />
+          {imageUrl && (
+            <img src={imageUrl} alt={pokemon.name} className={styles.image} />
+          )}
         </div>
         <div className={styles.info}>
           <h3 className={styles.name}>{pokemon.name}</h3>

@@ -19,13 +19,25 @@ const Pagination = ({
 }: PaginationProps) => {
   return (
     <div className={styles.pagination}>
-      <button onClick={onPrev} disabled={!hasPrev}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onPrev();
+        }}
+        disabled={!hasPrev}
+      >
         ← Prev
       </button>
       <span>
         Page {currentPage} of {totalPages}
       </span>
-      <button onClick={onNext} disabled={!hasNext}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onNext();
+        }}
+        disabled={!hasNext}
+      >
         Next →
       </button>
     </div>
