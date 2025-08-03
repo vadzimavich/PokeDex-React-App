@@ -4,14 +4,18 @@ import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.tsx';
 import { browserRouter } from './router.tsx';
 import { useSelectedItemsStore } from './store/selectedItemsStore.ts';
 import Flyout from './components/Flyout/Flyout.tsx';
+import { convertToCSV, downloadCSV } from './utils/csvConverter.ts';
 
 const App = () => {
   const { selectedPokemons, unselectAll } = useSelectedItemsStore();
   const selectedCount = selectedPokemons.length;
 
   const handleDownload = () => {
-    console.log('Downloading:', selectedPokemons);
-    alert(`TBD (Downloading ${selectedCount} items...)`);
+    if (selectedCount === 0) return;
+
+    const csvData = convertToCSV(selectedPokemons);
+    const fileName = `${selectedCount}_pokemons.csv`;
+    downloadCSV(csvData, fileName);
   };
 
   return (
