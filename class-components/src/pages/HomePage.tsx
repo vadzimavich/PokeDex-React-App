@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { getPokemonList, getPokemonFullDetails } from '../api/pokemonService';
+import { useSelectedItemsStore } from '../store/selectedItemsStore';
 
 import Main from '../components/Main/Main';
 import Pagination from '../components/Pagination/Pagination';
@@ -26,6 +27,9 @@ const HomePage = () => {
 
   const [searchTerm, setSearchTerm] = useLocalStorage('searchTerm', '');
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const { selectedPokemons, toggleSelectedItem } = useSelectedItemsStore();
+  const selectedIds = new Set(selectedPokemons.map((p) => p.id));
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -117,6 +121,8 @@ const HomePage = () => {
             isLoading={isLoading}
             error={error}
             onCardClick={handleCardClick}
+            selectedIds={selectedIds}
+            onToggleSelect={toggleSelectedItem}
           />
 
           {showPagination && (
