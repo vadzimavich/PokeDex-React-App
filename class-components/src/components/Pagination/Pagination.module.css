@@ -22,13 +22,13 @@
 }
 
 .pagination button:disabled {
-  background-color: #3a3a3a;
-  color: #777;
+  background-color: var(--color-button-disabled-bg);
+  color: var(--color-button-disabled-text);
   cursor: not-allowed;
 }
 
 .pagination span {
   font-size: 1rem;
   font-weight: 500;
-  color: #ccc;
+  color: var(--color-text-muted);
 }

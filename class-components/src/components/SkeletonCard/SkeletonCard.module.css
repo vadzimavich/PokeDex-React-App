@@ -1,13 +1,11 @@
 .card {
-  background-color: #2c2c2c;
+  background-color: var(--color-skeleton-bg); 
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .image {
   height: 230px;
-  background-color: #444;
 }
 
 .info {
@@ -16,7 +14,6 @@
 
 .line {
   height: 20px;
-  background-color: #444;
   border-radius: 4px;
   margin-bottom: 1rem;
 }
@@ -34,14 +31,18 @@
 .type {
   width: 70px;
   height: 25px;
-  background-color: #444;
   border-radius: 5px;
 }
 
 .image,
 .line,
 .type {
-  background: linear-gradient(90deg, #3c3c3c 25%, #444444 50%, #3c3c3c 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-shimmer-base) 25%,
+    var(--color-skeleton-shimmer-highlight) 50%,
+    var(--color-skeleton-shimmer-base) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 2.5s infinite linear;
 }

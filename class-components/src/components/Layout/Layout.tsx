@@ -1,18 +1,10 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
+import Header from '../Header/Header';
 
 const Layout = () => {
   return (
     <div className="app">
-      <nav
-        style={{ padding: '1rem', textAlign: 'center', background: '#2c2c2c' }}
-      >
-        <Link to="/" style={{ marginRight: '1.5rem', color: 'white' }}>
-          Home
-        </Link>
-        <Link to="/about" style={{ color: 'white' }}>
-          About
-        </Link>
-      </nav>
+      <Header />
       <main>
         <Outlet />
       </main>
