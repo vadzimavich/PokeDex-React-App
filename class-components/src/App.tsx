@@ -1,16 +1,36 @@
 import { StrictMode } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.tsx';
-import { routes } from './router.tsx';
+import { browserRouter } from './router.tsx';
+import { useSelectedItemsStore } from './store/selectedItemsStore.ts';
+import Flyout from './components/Flyout/Flyout.tsx';
 
-const browserRouter = createBrowserRouter(routes);
+const App = () => {
+  const { selectedPokemons, unselectAll } = useSelectedItemsStore();
+  const selectedCount = selectedPokemons.length;
 
-const App = () => (
-  <StrictMode>
-    <ErrorBoundary>
-      <RouterProvider router={browserRouter} />
-    </ErrorBoundary>
-  </StrictMode>
-);
+  const handleDownload = () => {
+    console.log('Downloading:', selectedPokemons);
+    alert(`TBD (Downloading ${selectedCount} items...)`);
+  };
+
+  return (
+    <StrictMode>
+      <ErrorBoundary>
+        <div className="app-container">
+          <RouterProvider router={browserRouter} />
+
+          {selectedCount > 0 && (
+            <Flyout
+              selectedCount={selectedCount}
+              onUnselectAll={unselectAll}
+              onDownload={handleDownload}
+            />
+          )}
+        </div>
+      </ErrorBoundary>
+    </StrictMode>
+  );
+};
 
 export default App;
