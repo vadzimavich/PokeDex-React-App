@@ -1,14 +1,39 @@
+import { Link } from 'react-router-dom';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useSearchParams } from 'react-router-dom';
 import Search from '../Search/Search';
+import ThemeSwitcher from '../ThemeSwitch/ThemeSwitch';
+import styles from './Header.module.css';
 
-interface HeaderProps {
-  onSearch: (searchTerm: string) => void;
-  initialValue: string;
-}
+const Header = () => {
+  const [searchTerm, setSearchTerm] = useLocalStorage('searchTerm', '');
+  const [_searchParams, setSearchParams] = useSearchParams();
 
-const Header = ({ onSearch, initialValue }: HeaderProps) => {
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    setSearchParams((prev) => {
+      prev.set('page', '1');
+      prev.delete('details');
+      return prev;
+    });
+  };
+
   return (
-    <header className="header">
-      <Search onSearch={onSearch} initialValue={initialValue} />
+    <header className={styles.header}>
+      <nav className={styles.nav}>
+        <Link to="/" className={styles.navLink}>
+          Home
+        </Link>
+        <Link to="/about" className={styles.navLink}>
+          About
+        </Link>
+      </nav>
+      <div className={styles.searchWrapper}>
+        <Search onSearch={handleSearch} initialValue={searchTerm} />
+      </div>
+      <div className={styles.themeSwitcherWrapper}>
+        <ThemeSwitcher />
+      </div>
     </header>
   );
 };

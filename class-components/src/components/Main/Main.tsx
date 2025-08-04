@@ -8,11 +8,20 @@ interface MainProps {
   isLoading: boolean;
   error: Error | null;
   onCardClick: (id: number) => void;
+  selectedIds: Set<number>;
+  onToggleSelect: (pokemon: PokemonDetails) => void;
 }
 
 const SKELETON_COUNT = 20;
 
-const Main = ({ pokemons, isLoading, error, onCardClick }: MainProps) => {
+const Main = ({
+  pokemons,
+  isLoading,
+  error,
+  onCardClick,
+  selectedIds,
+  onToggleSelect,
+}: MainProps) => {
   if (error) {
     return <main>Error: {error.message}</main>;
   }
@@ -31,7 +40,12 @@ const Main = ({ pokemons, isLoading, error, onCardClick }: MainProps) => {
 
   return (
     <main>
-      <CardList pokemons={pokemons} onCardClick={onCardClick} />
+      <CardList
+        pokemons={pokemons}
+        onCardClick={onCardClick}
+        selectedIds={selectedIds}
+        onToggleSelect={onToggleSelect}
+      />
     </main>
   );
 };

@@ -4,20 +4,43 @@ import styles from './Card.module.css';
 interface CardProps {
   pokemon: PokemonDetails;
   onCardClick: (id: number) => void;
+  isSelected: boolean;
+  onToggleSelect: (pokemon: PokemonDetails) => void;
 }
 
-const Card = ({ pokemon, onCardClick }: CardProps) => {
+const Card = ({
+  pokemon,
+  onCardClick,
+  isSelected,
+  onToggleSelect,
+}: CardProps) => {
   const imageUrl = pokemon.sprites.other['official-artwork'].front_default;
 
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    onToggleSelect(pokemon);
+  };
+
+  const handleCardClick = () => {
+    onCardClick(pokemon.id);
+  };
+
   return (
-    <div
-      onClick={(e) => {
-        e.stopPropagation(); // Оставляем stopPropagation здесь!
-        onCardClick(pokemon.id);
-      }}
-      style={{ cursor: 'pointer' }}
-    >
-      <div className={styles.card}>
+    <div onClick={handleCardClick} style={{ cursor: 'pointer' }}>
+      <div
+        className={`${styles.card} ${isSelected ? styles.selected : ''}`.trim()}
+      >
+        <div className={styles.checkboxContainer}>
+          <input
+            type="checkbox"
+            className={styles.checkbox}
+            checked={isSelected}
+            onChange={handleCheckboxChange}
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Select ${pokemon.name}`}
+          />
+        </div>
+
         <div className={styles.imageContainer}>
           <div className={styles.idLabel}>
             #{pokemon.id.toString().padStart(3, '0')}

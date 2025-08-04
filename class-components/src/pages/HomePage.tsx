@@ -8,10 +8,10 @@ import {
 } from 'react-router-dom';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { getPokemonList, getPokemonFullDetails } from '../api/pokemonService';
+import { useSelectedItemsStore } from '../store/selectedItemsStore';
 
 import Main from '../components/Main/Main';
 import Pagination from '../components/Pagination/Pagination';
-import Header from '../components/Header/Header';
 import type { PokemonDetails } from '../types';
 
 const POKEMON_PER_PAGE = 20;
@@ -24,8 +24,13 @@ const HomePage = () => {
   const [prevPageUrl, setPrevPageUrl] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(0);
 
-  const [searchTerm, setSearchTerm] = useLocalStorage('searchTerm', '');
+  // --- ВОЗВРАЩАЕМ ЛОГИКУ ЧТЕНИЯ ДАННЫХ ---
+  const [searchTerm] = useLocalStorage('searchTerm', '');
   const [searchParams, setSearchParams] = useSearchParams();
+  // ---
+
+  const { selectedPokemons, toggleSelectedItem } = useSelectedItemsStore();
+  const selectedIds = new Set(selectedPokemons.map((p) => p.id));
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -76,14 +81,6 @@ const HomePage = () => {
     }
   }, [currentPage, searchTerm, fetchPokemonsByUrl, fetchSinglePokemon]);
 
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    setSearchParams((prev) => {
-      prev.set('page', '1');
-      return prev;
-    });
-  };
-
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
       setSearchParams((prev) => {
@@ -105,7 +102,6 @@ const HomePage = () => {
 
   return (
     <>
-      <Header onSearch={handleSearch} initialValue={searchTerm} />
       <div style={{ display: 'flex' }}>
         <div
           style={{ flex: 1, minWidth: 0 }}
@@ -117,6 +113,8 @@ const HomePage = () => {
             isLoading={isLoading}
             error={error}
             onCardClick={handleCardClick}
+            selectedIds={selectedIds}
+            onToggleSelect={toggleSelectedItem}
           />
 
           {showPagination && (

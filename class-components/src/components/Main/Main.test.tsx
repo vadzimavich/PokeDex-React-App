@@ -1,9 +1,12 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { render, screen } from '../../__tests__/test-utils';
+import { describe, it, expect, vi } from 'vitest';
 import Main from './Main';
 import type { PokemonDetails } from '../../types';
 
 describe('Main Component', () => {
+  const mockOnToggleSelect = vi.fn();
+  const mockSelectedIds = new Set<number>();
+
   it('should render skeletons when loading', () => {
     render(
       <Main
@@ -11,6 +14,8 @@ describe('Main Component', () => {
         isLoading={true}
         error={null}
         onCardClick={() => {}}
+        selectedIds={mockSelectedIds}
+        onToggleSelect={mockOnToggleSelect}
       />
     );
     expect(screen.getAllByTestId('skeleton-card').length).toBeGreaterThan(0);
@@ -24,6 +29,8 @@ describe('Main Component', () => {
         isLoading={false}
         error={error}
         onCardClick={() => {}}
+        selectedIds={mockSelectedIds}
+        onToggleSelect={mockOnToggleSelect}
       />
     );
     expect(screen.getByText(/error: failed to fetch/i)).toBeInTheDocument();
@@ -53,6 +60,8 @@ describe('Main Component', () => {
         isLoading={false}
         error={null}
         onCardClick={() => {}}
+        selectedIds={mockSelectedIds}
+        onToggleSelect={mockOnToggleSelect}
       />
     );
     expect(screen.getByText('bulbasaur')).toBeInTheDocument();

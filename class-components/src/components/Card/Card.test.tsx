@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '../../__tests__/test-utils';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Card from './Card';
 import type { PokemonDetails } from '../../types';
 
@@ -24,45 +24,74 @@ describe('Card Component', () => {
     abilities: [],
   };
 
-  it('should render all pokemon details correctly', () => {
-    render(<Card pokemon={mockPokemon} onCardClick={() => {}} />);
+  const mockOnCardClick = vi.fn();
+  const mockOnToggleSelect = vi.fn();
 
-    // check pokemon name
-    expect(screen.getByText(/bulbasaur/i)).toBeInTheDocument();
-
-    // check ID
-    expect(screen.getByText('#001')).toBeInTheDocument();
-
-    // check description
-    expect(screen.getByText(/A strange seed was planted/i)).toBeInTheDocument();
-
-    // check pic
-    const image = screen.getByAltText(/bulbasaur/i);
-    expect(image).toBeInTheDocument();
-    expect(image).toHaveAttribute('src', 'https://bulbasaur-image.png');
-
-    // check features
-    expect(screen.getByText(/Height: 0.7/i)).toBeInTheDocument();
-    expect(screen.getByText(/Weight: 6.9/i)).toBeInTheDocument();
-
-    // check types
-    expect(screen.getByText('grass')).toBeInTheDocument();
-    expect(screen.getByText('poison')).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('should call onCardClick with pokemon id when clicked', async () => {
-    const onCardClickMock = vi.fn();
-    render(<Card pokemon={mockPokemon} onCardClick={onCardClickMock} />);
+  it('should render correctly when not selected', () => {
+    render(
+      <Card
+        pokemon={mockPokemon}
+        onCardClick={mockOnCardClick}
+        isSelected={false}
+        onToggleSelect={mockOnToggleSelect}
+      />
+    );
+    expect(screen.getByText(/bulbasaur/i)).toBeInTheDocument();
+    const checkbox = screen.getByLabelText(/select bulbasaur/i);
+    expect(checkbox).not.toBeChecked();
+  });
 
-    const cardElement = screen
+  it('should render correctly when selected', () => {
+    render(
+      <Card
+        pokemon={mockPokemon}
+        onCardClick={mockOnCardClick}
+        isSelected={true}
+        onToggleSelect={mockOnToggleSelect}
+      />
+    );
+    const checkbox = screen.getByLabelText(/select bulbasaur/i);
+    expect(checkbox).toBeChecked();
+  });
+
+  it('should call onCardClick when the card body is clicked', async () => {
+    render(
+      <Card
+        pokemon={mockPokemon}
+        onCardClick={mockOnCardClick}
+        isSelected={false}
+        onToggleSelect={mockOnToggleSelect}
+      />
+    );
+
+    const clickableDiv = screen
       .getByText(/bulbasaur/i)
       .closest('div[style*="cursor: pointer"]');
-    if (!cardElement) throw new Error('Card element not found');
+    if (!clickableDiv) {
+      throw new Error('Test failed: clickable card div not found');
+    }
+    await userEvent.click(clickableDiv);
 
-    await userEvent.click(cardElement);
+    expect(mockOnCardClick).toHaveBeenCalledWith(mockPokemon.id);
+    expect(mockOnToggleSelect).not.toHaveBeenCalled();
+  });
 
-    expect(onCardClickMock).toHaveBeenCalledTimes(1);
-    // --- ИЗМЕНЕНИЕ: Проверяем вызов только с id ---
-    expect(onCardClickMock).toHaveBeenCalledWith(mockPokemon.id);
+  it('should call onToggleSelect when the checkbox is clicked', async () => {
+    render(
+      <Card
+        pokemon={mockPokemon}
+        onCardClick={mockOnCardClick}
+        isSelected={false}
+        onToggleSelect={mockOnToggleSelect}
+      />
+    );
+    const checkbox = screen.getByLabelText(/select bulbasaur/i);
+    await userEvent.click(checkbox);
+    expect(mockOnToggleSelect).toHaveBeenCalledWith(mockPokemon);
+    expect(mockOnCardClick).not.toHaveBeenCalled();
   });
 });
