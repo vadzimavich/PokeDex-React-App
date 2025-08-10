@@ -1,4 +1,4 @@
-import { screen, render } from './__tests__/test-utils';
+import { screen, render, waitFor } from './__tests__/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import App from './App';
@@ -74,5 +74,33 @@ describe('App Integration Tests', () => {
     await user.click(themeSwitcher);
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
     expect(localStorage.getItem('app-theme')).toBe('dark');
+  });
+
+  it('should filter pokemons when searching and clear filter when search is cleared', async () => {
+    renderApp();
+
+    expect(await screen.findByText('bulbasaur')).toBeInTheDocument();
+    expect(await screen.findByText('ivysaur')).toBeInTheDocument();
+
+    const searchInput = screen.getByPlaceholderText(/search.../i);
+    const searchButton = screen.getByRole('button', { name: /search/i });
+
+    await userEvent.type(searchInput, 'ivysaur');
+    await userEvent.click(searchButton);
+
+    expect(await screen.findByText('ivysaur')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.queryByText('bulbasaur')).not.toBeInTheDocument();
+    });
+
+    expect(screen.queryByText(/page 1 of/i)).not.toBeInTheDocument();
+
+    await userEvent.clear(searchInput);
+    await userEvent.click(searchButton);
+
+    expect(await screen.findByText('bulbasaur')).toBeInTheDocument();
+    expect(await screen.findByText('ivysaur')).toBeInTheDocument();
+    expect(await screen.findByText(/page 1 of/i)).toBeInTheDocument();
   });
 });
