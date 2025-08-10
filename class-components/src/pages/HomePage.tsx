@@ -5,7 +5,7 @@ import {
   Outlet,
   useOutlet,
 } from 'react-router-dom';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useSearchStore } from '../store/searchStore';
 import { useSelectedItemsStore } from '../store/selectedItemsStore';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getPokemonList, getPokemonFullDetails } from '../api/pokemonService';
@@ -16,7 +16,7 @@ import Pagination from '../components/Pagination/Pagination';
 const POKEMON_PER_PAGE = 20;
 
 const HomePage = () => {
-  const [searchTerm] = useLocalStorage('searchTerm', '');
+  const { searchTerm } = useSearchStore();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { selectedPokemons, toggleSelectedItem } = useSelectedItemsStore();
