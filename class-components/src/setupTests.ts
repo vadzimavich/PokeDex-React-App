@@ -1,6 +1,7 @@
 import { fetch, Headers, Request, Response } from 'undici';
 import { server } from './__tests__/server';
 import { useSelectedItemsStore } from './store/selectedItemsStore';
+import { useSearchStore } from './store/searchStore';
 
 Object.assign(globalThis, { fetch, Headers, Request, Response });
 
@@ -14,13 +15,16 @@ Object.defineProperty(window, 'scrollTo', {
   writable: true,
 });
 
-const initialState = useSelectedItemsStore.getState();
+const initialSelectedItemsState = useSelectedItemsStore.getState();
+const initialSearchState = useSearchStore.getState();
 
 beforeAll(() => server.listen());
 
 afterEach(() => {
   server.resetHandlers();
-  useSelectedItemsStore.setState(initialState);
+  useSelectedItemsStore.setState(initialSelectedItemsState);
+  useSearchStore.setState(initialSearchState);
+  localStorage.clear();
 });
 
 afterAll(() => server.close());

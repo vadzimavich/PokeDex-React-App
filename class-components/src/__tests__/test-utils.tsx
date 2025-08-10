@@ -1,11 +1,25 @@
 /* eslint-disable react-refresh/only-export-components */
 import { render, type RenderOptions } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 import { type ReactElement } from 'react';
 import { ThemeProvider } from '../contexts/ThemeContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
+
+const testQueryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 const AppProviders = ({ children }: { children: React.ReactNode }) => {
-  return <ThemeProvider>{children}</ThemeProvider>;
+  testQueryClient.clear();
+  return (
+    <QueryClientProvider client={testQueryClient}>
+      <ThemeProvider>{children}</ThemeProvider>
+    </QueryClientProvider>
+  );
 };
 
 const customRender = (
@@ -16,7 +30,9 @@ const customRender = (
 export const renderWithRouter = (ui: ReactElement, { route = '/' } = {}) => {
   return render(ui, {
     wrapper: ({ children }) => (
-      <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+      <AppProviders>
+        <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+      </AppProviders>
     ),
   });
 };

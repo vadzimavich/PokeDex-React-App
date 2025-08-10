@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw';
-import { render, screen } from '../../__tests__/test-utils';
+import { renderWithRouter, screen } from '../../__tests__/test-utils';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { server } from '../../__tests__/server';
 import PokemonDetailView from './PokemonDetailView';
 
@@ -22,12 +22,11 @@ describe('PokemonDetailView Component', () => {
   });
 
   const renderComponent = (initialRoute: string) => {
-    return render(
-      <MemoryRouter initialEntries={[initialRoute]}>
-        <Routes>
-          <Route path="/details/:pokemonId" element={<PokemonDetailView />} />
-        </Routes>
-      </MemoryRouter>
+    return renderWithRouter(
+      <Routes>
+        <Route path="/details/:pokemonId" element={<PokemonDetailView />} />
+      </Routes>,
+      { route: initialRoute }
     );
   };
 

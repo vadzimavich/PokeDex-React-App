@@ -1,8 +1,8 @@
-import { render, screen } from '../../__tests__/test-utils';
+import { renderWithRouter, screen } from '../../__tests__/test-utils';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Header from './Header';
+import { useSearchStore } from '../../store/searchStore';
 
 const mockSetSearchParams = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -13,25 +13,30 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-vi.mock('../../hooks/useLocalStorage', () => ({
-  useLocalStorage: () => ['bulbasaur', vi.fn()],
-}));
-
 describe('Header Component', () => {
-  it('should call setSearchParams on search', async () => {
-    render(
-      <MemoryRouter>
-        <Header />
-      </MemoryRouter>
+  beforeEach(() => {
+    vi.clearAllMocks();
+    useSearchStore.setState({
+      searchTerm: '',
+      setSearchTerm: useSearchStore.getState().setSearchTerm,
+    });
+  });
+
+  it('should call setSearchTerm and setSearchParams on search', async () => {
+    const setSearchTermSpy = vi.spyOn(
+      useSearchStore.getState(),
+      'setSearchTerm'
     );
+
+    renderWithRouter(<Header />);
 
     const searchInput = screen.getByPlaceholderText(/search.../i);
     const searchButton = screen.getByRole('button', { name: /search/i });
 
-    await userEvent.clear(searchInput);
     await userEvent.type(searchInput, 'pikachu');
     await userEvent.click(searchButton);
 
+    expect(setSearchTermSpy).toHaveBeenCalledWith('pikachu');
     expect(mockSetSearchParams).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,4 +1,3 @@
-import { useState, useEffect, useCallback } from 'react';
 import {
   useSearchParams,
   useNavigate,
@@ -6,28 +5,19 @@ import {
   Outlet,
   useOutlet,
 } from 'react-router-dom';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { getPokemonList, getPokemonFullDetails } from '../api/pokemonService';
+import { useSearchStore } from '../store/searchStore';
 import { useSelectedItemsStore } from '../store/selectedItemsStore';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { getPokemonList, getPokemonFullDetails } from '../api/pokemonService';
 
 import Main from '../components/Main/Main';
 import Pagination from '../components/Pagination/Pagination';
-import type { PokemonDetails } from '../types';
 
 const POKEMON_PER_PAGE = 20;
 
 const HomePage = () => {
-  const [pokemons, setPokemons] = useState<PokemonDetails[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [nextPageUrl, setNextPageUrl] = useState<string | null>(null);
-  const [prevPageUrl, setPrevPageUrl] = useState<string | null>(null);
-  const [totalPages, setTotalPages] = useState(0);
-
-  // --- ВОЗВРАЩАЕМ ЛОГИКУ ЧТЕНИЯ ДАННЫХ ---
-  const [searchTerm] = useLocalStorage('searchTerm', '');
+  const { searchTerm } = useSearchStore();
   const [searchParams, setSearchParams] = useSearchParams();
-  // ---
 
   const { selectedPokemons, toggleSelectedItem } = useSelectedItemsStore();
   const selectedIds = new Set(selectedPokemons.map((p) => p.id));
@@ -38,48 +28,36 @@ const HomePage = () => {
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
-  const fetchPokemonsByUrl = useCallback(async (url: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const { pokemons, next, previous, count } = await getPokemonList(url);
-      setPokemons(pokemons);
-      setNextPageUrl(next);
-      setPrevPageUrl(previous);
-      setTotalPages(Math.ceil(count / POKEMON_PER_PAGE));
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const queryKey = searchTerm
+    ? ['pokemonSearch', searchTerm]
+    : ['pokemons', currentPage];
 
-  const fetchSinglePokemon = useCallback(async (name: string) => {
-    setIsLoading(true);
-    setError(null);
-    setNextPageUrl(null);
-    setPrevPageUrl(null);
-    try {
-      const pokemon = await getPokemonFullDetails(name.toLowerCase());
-      setPokemons([pokemon]);
-      setTotalPages(1);
-    } catch (err) {
-      setError(new Error(`Pokemon "${name}" not found.`));
-      setPokemons([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
+  const queryFn = async () => {
     if (searchTerm) {
-      fetchSinglePokemon(searchTerm);
-    } else {
-      const offset = (currentPage - 1) * POKEMON_PER_PAGE;
-      const url = `https://pokeapi.co/api/v2/pokemon?limit=${POKEMON_PER_PAGE}&offset=${offset}`;
-      fetchPokemonsByUrl(url);
+      const pokemon = await getPokemonFullDetails(searchTerm.toLowerCase());
+      return {
+        pokemons: [pokemon],
+        next: null,
+        previous: null,
+        count: 1,
+      };
     }
-  }, [currentPage, searchTerm, fetchPokemonsByUrl, fetchSinglePokemon]);
+    const offset = (currentPage - 1) * POKEMON_PER_PAGE;
+    const url = `https://pokeapi.co/api/v2/pokemon?limit=${POKEMON_PER_PAGE}&offset=${offset}`;
+    return getPokemonList(url);
+  };
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey,
+    queryFn,
+    placeholderData: keepPreviousData,
+  });
+
+  const pokemons = data?.pokemons || [];
+  const nextPageUrl = data?.next;
+  const prevPageUrl = data?.previous;
+  const totalCount = data?.count || 0;
+  const totalPages = Math.ceil(totalCount / POKEMON_PER_PAGE);
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
@@ -98,7 +76,7 @@ const HomePage = () => {
     navigate(`/${location.search}`);
   };
 
-  const showPagination = !searchTerm && !error;
+  const showPagination = !searchTerm && !isError;
 
   return (
     <>
@@ -111,7 +89,7 @@ const HomePage = () => {
           <Main
             pokemons={pokemons}
             isLoading={isLoading}
-            error={error}
+            error={isError ? (error as Error) : null}
             onCardClick={handleCardClick}
             selectedIds={selectedIds}
             onToggleSelect={toggleSelectedItem}
