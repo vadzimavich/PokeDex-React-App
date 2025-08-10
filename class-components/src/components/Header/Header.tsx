@@ -3,6 +3,7 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useSearchParams } from 'react-router-dom';
 import Search from '../Search/Search';
 import ThemeSwitcher from '../ThemeSwitch/ThemeSwitch';
+import RefreshButton from '../RefreshButton/RefreshButton';
 import styles from './Header.module.css';
 
 const Header = () => {
@@ -31,7 +32,8 @@ const Header = () => {
       <div className={styles.searchWrapper}>
         <Search onSearch={handleSearch} initialValue={searchTerm} />
       </div>
-      <div className={styles.themeSwitcherWrapper}>
+      <div className={styles.controlsWrapper}>
+        <RefreshButton />
         <ThemeSwitcher />
       </div>
     </header>
