@@ -1,48 +1,42 @@
-import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { getPokemonFullDetails } from '../../api/pokemonService';
-import type { PokemonDetails } from '../../types';
+
 import styles from './PokemonDetailView.module.css';
 import cardStyles from '../Card/Card.module.css';
 
 const PokemonDetailView = () => {
-  const [pokemon, setPokemon] = useState<PokemonDetails | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
   const { pokemonId } = useParams<{ pokemonId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const {
+    data: pokemon,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['pokemon', pokemonId],
+    queryFn: () => {
+      if (!pokemonId) {
+        return Promise.reject(new Error('Pokemon ID is required'));
+      }
+      return getPokemonFullDetails(pokemonId);
+    },
+    enabled: !!pokemonId,
+  });
 
   const handleClose = () => {
     navigate(`/${location.search}`);
   };
 
-  useEffect(() => {
-    if (pokemonId) {
-      const fetchDetails = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-          const data = await getPokemonFullDetails(pokemonId);
-          setPokemon(data);
-        } catch (err) {
-          setError(err as Error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      fetchDetails();
-    }
-  }, [pokemonId]);
-
   return (
-    <aside className={styles.detailsView}>
+    <aside className={styles.detailsView} role="complementary">
       <button onClick={handleClose} className={styles.closeButton}>
         ×
       </button>
       {isLoading && <p>Loading details...</p>}
-      {error && <p>Error: {error.message}</p>}
+      {isError && <p>Error: {(error as Error).message}</p>}
       {pokemon && (
         <div className={styles.content}>
           {pokemon.sprites.other['official-artwork'].front_default && (
