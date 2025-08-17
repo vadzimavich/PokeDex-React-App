@@ -1,0 +1,110 @@
+'use client';
+
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useSelectedItemsStore } from '@/store/selectedItemsStore';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { getPokemonList, getPokemonFullDetails } from '@/api/pokemonService';
+
+import Main from '@/components/Main/Main';
+import Pagination from '@/components/Pagination/Pagination';
+import type { PokemonDetails } from '@/types';
+
+const POKEMON_PER_PAGE = 20;
+
+type InitialData =
+  | {
+      pokemons: PokemonDetails[];
+      next: string | null;
+      previous: string | null;
+      count: number;
+    }
+  | null
+  | undefined;
+
+interface HomePageClientProps {
+  initialData: InitialData;
+  initialError: Error | null;
+  currentPage: number;
+  searchTerm: string;
+}
+
+export default function HomePageClient({
+  initialData,
+  initialError,
+  currentPage,
+  searchTerm,
+}: HomePageClientProps) {
+  const { selectedPokemons, toggleSelectedItem } = useSelectedItemsStore();
+  const selectedIds = new Set(selectedPokemons.map((p) => p.id));
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const queryKey = searchTerm
+    ? ['pokemonSearch', searchTerm]
+    : ['pokemons', currentPage];
+
+  const queryFn = async () => {
+    if (searchTerm) {
+      const pokemon = await getPokemonFullDetails(searchTerm.toLowerCase());
+      return {
+        pokemons: [pokemon],
+        next: null,
+        previous: null,
+        count: 1,
+      };
+    }
+    const offset = (currentPage - 1) * POKEMON_PER_PAGE;
+    const url = `https://pokeapi.co/api/v2/pokemon?limit=${POKEMON_PER_PAGE}&offset=${offset}`;
+    return getPokemonList(url);
+  };
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey,
+    queryFn,
+    placeholderData: keepPreviousData,
+    initialData: initialError ? undefined : initialData,
+  });
+
+  const pokemons = data?.pokemons || [];
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', newPage.toString());
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const handleCardClick = (id: number) => {
+    router.push(`/details/${id}?${searchParams.toString()}`);
+  };
+
+  // TODO: closeDetails
+
+  return (
+    <div style={{ display: 'flex' }}>
+      <div
+        style={{ flex: 1, minWidth: 0 }}
+        // onClick={outlet ? closeDetails : undefined}
+        data-testid="main-panel"
+      >
+        <Main
+          pokemons={pokemons}
+          isLoading={isLoading}
+          error={isError ? (error as Error) : initialError}
+          onCardClick={handleCardClick}
+          selectedIds={selectedIds}
+          onToggleSelect={toggleSelectedItem}
+        />
+        <Pagination
+          onNext={() => handlePageChange(currentPage + 1)}
+          onPrev={() => handlePageChange(currentPage - 1)}
+          hasNext={!!data?.next}
+          hasPrev={!!data?.previous}
+          currentPage={currentPage}
+          totalPages={Math.ceil((data?.count || 0) / POKEMON_PER_PAGE)}
+        />
+      </div>
+    </div>
+  );
+}
