@@ -1,13 +1,18 @@
 'use client';
 
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { useSelectedItemsStore } from '@/store/selectedItemsStore';
+import { useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from '@/navigation';
+import { useTranslations } from 'next-intl';
+import { useSelectedItemsStore } from '@/app/store/selectedItemsStore';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { getPokemonList, getPokemonFullDetails } from '@/api/pokemonService';
+import {
+  getPokemonList,
+  getPokemonFullDetails,
+} from '@/app/api/pokemonService';
 
-import Main from '@/components/Main/Main';
-import Pagination from '@/components/Pagination/Pagination';
-import type { PokemonDetails } from '@/types';
+import Main from '@/app/components/Main/Main';
+import Pagination from '@/app/components/Pagination/Pagination';
+import type { PokemonDetails } from '@/app/types';
 
 const POKEMON_PER_PAGE = 20;
 
@@ -35,8 +40,11 @@ export default function HomePageClient({
   searchTerm,
 }: HomePageClientProps) {
   const { selectedPokemons, toggleSelectedItem } = useSelectedItemsStore();
-  const selectedIds = new Set(selectedPokemons.map((p) => p.id));
+  const selectedIds = new Set(
+    selectedPokemons.map((p: PokemonDetails) => p.id)
+  );
 
+  const t = useTranslations('Pagination');
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -67,6 +75,7 @@ export default function HomePageClient({
     initialData: initialError ? undefined : initialData,
   });
 
+  const totalPages = Math.ceil((data?.count || 0) / POKEMON_PER_PAGE);
   const pokemons = data?.pokemons || [];
 
   const handlePageChange = (newPage: number) => {
@@ -76,7 +85,7 @@ export default function HomePageClient({
   };
 
   const handleCardClick = (id: number) => {
-    router.push(`/details/${id}?${searchParams.toString()}`);
+    router.push(`/details/${id}`);
   };
 
   // TODO: closeDetails
@@ -102,7 +111,7 @@ export default function HomePageClient({
           hasNext={!!data?.next}
           hasPrev={!!data?.previous}
           currentPage={currentPage}
-          totalPages={Math.ceil((data?.count || 0) / POKEMON_PER_PAGE)}
+          totalPagesText={t('page', { currentPage, totalPages })}
         />
       </div>
     </div>

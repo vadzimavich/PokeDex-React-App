@@ -1,11 +1,15 @@
+'use client';
+
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface SearchProps {
   onSearch: (searchTerm: string) => void;
   initialValue: string;
 }
 
-const Search = ({ onSearch, initialValue }: SearchProps) => {
+export default function Search({ onSearch, initialValue }: SearchProps) {
+  const t = useTranslations('Search');
   const [inputValue, setInputValue] = useState(initialValue);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,15 +25,13 @@ const Search = ({ onSearch, initialValue }: SearchProps) => {
       <input
         type="text"
         className="search-input"
-        placeholder="Search..."
+        placeholder={t('placeholder')}
         value={inputValue}
         onChange={handleInputChange}
       />
       <button className="search-button" onClick={handleSearchClick}>
-        Search
+        {t('button')}
       </button>
     </div>
   );
-};
-
-export default Search;
+}

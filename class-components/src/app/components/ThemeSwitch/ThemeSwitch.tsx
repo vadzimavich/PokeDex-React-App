@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { ThemeContext } from '../../app/contexts/theme';
+import { ThemeContext } from '@/app/contexts/theme';
 import styles from './ThemeSwitch.module.css';
 
 const ThemeSwitch = () => {

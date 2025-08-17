@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
+import { getMessages } from 'next-intl/server';
 import '../globals.css';
 import Providers from '../providers';
+import Header from '@/app/components/Header/Header';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const metadata = {
@@ -8,17 +10,22 @@ export const metadata = {
   description: 'A Pokedex app built with Next.js',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
   params: { locale },
 }: {
   children: ReactNode;
   params: { locale: string };
 }) {
+  const messages = await getMessages();
+
   return (
     <html lang={locale}>
       <body>
-        <Providers>{children}</Providers>
+        <Providers locale={locale} messages={messages}>
+          <Header />
+          <main>{children}</main>
+        </Providers>
       </body>
     </html>
   );

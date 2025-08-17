@@ -1,5 +1,8 @@
-import { getPokemonList, getPokemonFullDetails } from '@/api/pokemonService';
-import HomePageClient from '@/components/HomePageClient/HomePageClient';
+import {
+  getPokemonList,
+  getPokemonFullDetails,
+} from '@/app/api/pokemonService';
+import HomePageClient from '@/app/components/HomePageClient/HomePageClient';
 
 const POKEMON_PER_PAGE = 20;
 

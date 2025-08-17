@@ -1,3 +1,5 @@
+'use client';
+
 import styles from './Pagination.module.css';
 
 interface PaginationProps {
@@ -6,7 +8,7 @@ interface PaginationProps {
   hasPrev: boolean;
   hasNext: boolean;
   currentPage: number;
-  totalPages: number;
+  totalPagesText: string;
 }
 
 const Pagination = ({
@@ -14,8 +16,7 @@ const Pagination = ({
   onNext,
   hasPrev,
   hasNext,
-  currentPage,
-  totalPages,
+  totalPagesText,
 }: PaginationProps) => {
   return (
     <div className={styles.pagination}>
@@ -28,9 +29,7 @@ const Pagination = ({
       >
         ← Prev
       </button>
-      <span>
-        Page {currentPage} of {totalPages}
-      </span>
+      <span>{totalPagesText}</span>
       <button
         onClick={(e) => {
           e.stopPropagation();

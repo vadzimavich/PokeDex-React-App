@@ -2,10 +2,21 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { useState } from 'react';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { useState, type ReactNode } from 'react';
+import { ThemeProvider } from '@/app/contexts/ThemeContext';
+import { NextIntlClientProvider, AbstractIntlMessages } from 'next-intl';
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+type ProvidersProps = {
+  children: ReactNode;
+  locale: string;
+  messages: AbstractIntlMessages;
+};
+
+export default function Providers({
+  children,
+  locale,
+  messages,
+}: ProvidersProps) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -19,9 +30,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>{children}</ThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    // 3. Оборачиваем все в NextIntlClientProvider
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>{children}</ThemeProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </NextIntlClientProvider>
   );
 }
