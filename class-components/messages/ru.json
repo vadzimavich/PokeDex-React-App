@@ -1,0 +1,25 @@
+{
+  "Header": {
+    "home": "Главная",
+    "about": "О проекте"
+  },
+  "Search": {
+    "placeholder": "Поиск...",
+    "button": "Найти"
+  },
+  "Pagination": {
+    "page": "Страница {currentPage} из {totalPages}"
+  },
+  "Flyout": {
+    "itemsSelected": "{count, plural, =1 {# элемент выбран} few {# элемента выбрано} other {# элементов выбрано}}",
+    "unselectAll": "Снять выделение",
+    "download": "Скачать"
+  },
+  "AboutPage": {
+    "title": "О Pokedex",
+    "author": "Это приложение создано @vadzimavich.",
+    "course": "Это учебный проект для {link}.",
+    "courseLinkText": "курса RS School React",
+    "back": "Вернуться на главную"
+  }
+}

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import './globals.css';
-import Providers from './providers';
+import '../globals.css';
+import Providers from '../providers';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const metadata = {
@@ -8,9 +8,15 @@ export const metadata = {
   description: 'A Pokedex app built with Next.js',
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({
+  children,
+  params: { locale },
+}: {
+  children: ReactNode;
+  params: { locale: string };
+}) {
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body>
         <Providers>{children}</Providers>
       </body>

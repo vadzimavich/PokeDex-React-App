@@ -1,0 +1,25 @@
+{
+  "Header": {
+    "home": "Home",
+    "about": "About"
+  },
+  "Search": {
+    "placeholder": "Search...",
+    "button": "Search"
+  },
+  "Pagination": {
+    "page": "Page {currentPage} of {totalPages}"
+  },
+  "Flyout": {
+    "itemsSelected": "{count, plural, =1 {# item selected} other {# items selected}}",
+    "unselectAll": "Unselect all",
+    "download": "Download"
+  },
+  "AboutPage": {
+    "title": "About Pokedex",
+    "author": "This application was created by @vadzimavich.",
+    "course": "It's a learning project for the {link}.",
+    "courseLinkText": "RS School React Course",
+    "back": "Back to Home"
+  }
+}
