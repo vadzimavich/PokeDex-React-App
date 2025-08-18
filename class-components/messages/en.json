@@ -26,5 +26,10 @@
   },
   "DetailsPage": {
     "backToList": "← Back to list"
+  },
+  "NotFound": {
+    "title": "Page Not Found",
+    "description": "Oops! The page you are looking for does not exist...",
+    "backToHome": "Go back to the homepage"
   }
 }
