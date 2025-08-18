@@ -1,4 +1,4 @@
-import { render, screen } from '../../app/__tests__/test-utils';
+import { render, screen } from '@/app/__tests__/test-utils';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

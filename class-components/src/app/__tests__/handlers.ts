@@ -26,10 +26,15 @@ const mockPokemonDetails = (id: number, name: string) => ({
   height: 7,
   weight: 69,
   sprites: {
-    other: { 'official-artwork': { front_default: `image_${name}.png` } },
+    other: {
+      'official-artwork': { front_default: `https://example.com/${name}.png` },
+    },
   },
   types: [{ type: { name: 'grass' } }],
-  stats: [],
+  stats: [
+    { base_stat: 45, stat: { name: 'hp' } },
+    { base_stat: 49, stat: { name: 'attack' } },
+  ],
   abilities: [],
   species: { url: `https://pokeapi.co/api/v2/pokemon-species/${id}/` },
 });
@@ -54,7 +59,7 @@ export const handlers = [
   }),
 
   // bulbasaur (id 1)
-  http.get('https://pokeapi.co/api/v2/pokemon/1/', async () => {
+  http.get('https://pokeapi.co/api/v2/pokemon/1', async () => {
     await delay(150);
     return HttpResponse.json(mockPokemonDetails(1, 'bulbasaur'));
   }),
@@ -72,7 +77,7 @@ export const handlers = [
     await delay(150);
     return HttpResponse.json(mockPokemonDetails(2, 'ivysaur'));
   }),
-  http.get('https://pokeapi.co/api/v2/pokemon-species/2/', async () => {
+  http.get('https://pokeapi.co/api/v2/pokemon-species/2', async () => {
     await delay(150);
     return HttpResponse.json(mockSpeciesDetails('ivysaur'));
   }),
@@ -82,7 +87,7 @@ export const handlers = [
     await delay(150);
     return HttpResponse.json(mockPokemonDetails(4, 'charmander'));
   }),
-  http.get('https://pokeapi.co/api/v2/pokemon-species/4/', async () => {
+  http.get('https://pokeapi.co/api/v2/pokemon-species/4', async () => {
     await delay(150);
     return HttpResponse.json(mockSpeciesDetails('charmander'));
   }),
@@ -92,7 +97,7 @@ export const handlers = [
     await delay(150);
     return HttpResponse.json(mockPokemonDetails(5, 'charmeleon'));
   }),
-  http.get('https://pokeapi.co/api/v2/pokemon-species/5/', async () => {
+  http.get('https://pokeapi.co/api/v2/pokemon-species/5', async () => {
     await delay(150);
     return HttpResponse.json(mockSpeciesDetails('charmeleon'));
   }),

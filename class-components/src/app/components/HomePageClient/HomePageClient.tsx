@@ -31,7 +31,7 @@ type SerializableError = {
   message: string;
 };
 
-interface HomePageClientProps {
+export interface HomePageClientProps {
   initialData: InitialData;
   initialError: SerializableError | null;
   currentPage: number;

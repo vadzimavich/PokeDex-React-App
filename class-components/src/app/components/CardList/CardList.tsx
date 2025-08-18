@@ -1,4 +1,4 @@
-import type { PokemonDetails } from '../../app/types';
+import type { PokemonDetails } from '../../../app/types';
 import Card from '../Card/Card';
 import styles from './CardList.module.css';
 

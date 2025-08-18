@@ -1,4 +1,4 @@
-import { render, screen } from '../../app/__tests__/test-utils';
+import { render, screen } from '@/app/__tests__/test-utils';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import Pagination from './Pagination';
@@ -15,10 +15,12 @@ describe('Pagination Component', () => {
         hasNext={true}
         hasPrev={false}
         currentPage={1}
-        totalPages={10}
+        totalPagesText="Page 1 of 10"
+        prevText="← Prev"
+        nextText="Next →"
       />
     );
-    const nextButton = screen.getByRole('button', { name: /next/i });
+    const nextButton = screen.getByRole('button', { name: /next →/i });
     await userEvent.click(nextButton);
     expect(mockOnNext).toHaveBeenCalledTimes(1);
   });
@@ -31,10 +33,12 @@ describe('Pagination Component', () => {
         hasNext={true}
         hasPrev={true}
         currentPage={2}
-        totalPages={10}
+        totalPagesText="Page 2 of 10"
+        prevText="← Prev"
+        nextText="Next →"
       />
     );
-    const prevButton = screen.getByRole('button', { name: /prev/i });
+    const prevButton = screen.getByRole('button', { name: /← prev/i });
     await userEvent.click(prevButton);
     expect(mockOnPrev).toHaveBeenCalledTimes(1);
   });

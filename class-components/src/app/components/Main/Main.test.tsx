@@ -1,7 +1,7 @@
-import { render, screen } from '../../app/__tests__/test-utils';
+import { render, screen } from '@/app/__tests__/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import Main from './Main';
-import type { PokemonDetails } from '../../app/types';
+import type { PokemonDetails } from '../../../app/types';
 
 describe('Main Component', () => {
   const mockOnToggleSelect = vi.fn();
@@ -44,7 +44,12 @@ describe('Main Component', () => {
         height: 7,
         weight: 69,
         sprites: {
-          other: { 'official-artwork': { front_default: 'image.png' } },
+          other: {
+            'official-artwork': {
+              front_default:
+                'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png',
+            },
+          },
         },
         types: [{ type: { name: 'grass' } }],
         description: 'A grass pokemon',

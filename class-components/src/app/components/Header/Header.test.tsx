@@ -1,42 +1,49 @@
-import { renderWithRouter, screen } from '../../app/__tests__/test-utils';
-import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent } from '../../__tests__/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Header from './Header';
-import { useSearchStore } from '../../app/store/searchStore';
+import { useSearchStore } from '@/app/store/searchStore';
 
-const mockSetSearchParams = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useSearchParams: () => [new URLSearchParams(), mockSetSearchParams],
-  };
-});
+const mockPush = vi.fn();
+
+vi.mock('../../../navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+  usePathname: () => '/',
+  Link: ({ href, children }: { href: string; children: React.ReactNode }) => (
+    <a href={href}>{children}</a>
+  ),
+}));
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(),
+}));
 
 describe('Header Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    useSearchStore.setState({
-      searchTerm: '',
-      setSearchTerm: useSearchStore.getState().setSearchTerm,
-    });
+    useSearchStore.setState({ searchTerm: '' });
   });
 
-  it('should call setSearchTerm and setSearchParams on search', async () => {
+  it('should render navigation links', () => {
+    render(<Header />);
+    expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /about/i })).toBeInTheDocument();
+  });
+
+  it('should call setSearchTerm and router.push on search', async () => {
     const setSearchTermSpy = vi.spyOn(
       useSearchStore.getState(),
       'setSearchTerm'
     );
-
-    renderWithRouter(<Header />);
+    render(<Header />);
 
     const searchInput = screen.getByPlaceholderText(/search.../i);
     const searchButton = screen.getByRole('button', { name: /search/i });
 
-    await userEvent.type(searchInput, 'pikachu');
-    await userEvent.click(searchButton);
+    fireEvent.change(searchInput, { target: { value: 'pikachu' } });
+    fireEvent.click(searchButton);
 
     expect(setSearchTermSpy).toHaveBeenCalledWith('pikachu');
-    expect(mockSetSearchParams).toHaveBeenCalledTimes(1);
+    expect(mockPush).toHaveBeenCalledWith('/?page=1&search=pikachu');
   });
 });

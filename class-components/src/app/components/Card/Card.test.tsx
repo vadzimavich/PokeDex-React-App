@@ -1,8 +1,8 @@
-import { render, screen } from '../../app/__tests__/test-utils';
+import { render, screen } from '@/app/__tests__/test-utils';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Card from './Card';
-import type { PokemonDetails } from '../../app/types';
+import type { PokemonDetails } from '../../../app/types';
 
 describe('Card Component', () => {
   const mockPokemon: PokemonDetails = {

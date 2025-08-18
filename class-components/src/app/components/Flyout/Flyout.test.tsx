@@ -1,70 +1,95 @@
-import { render, screen } from '../../app/__tests__/test-utils';
+import { render, screen, act } from '@/app/__tests__/test-utils';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Flyout from './Flyout';
+import { useSelectedItemsStore } from '@/app/store/selectedItemsStore';
+import * as actions from '@/app/actions';
+import type { PokemonDetails } from '@/app/types';
+
+vi.mock('@/app/actions', async (importOriginal) => {
+  const actual = await importOriginal<typeof actions>();
+  return {
+    ...actual,
+    downloadCsvAction: vi.fn().mockResolvedValue({ csvData: 'mock,csv,data' }),
+  };
+});
+
+const mockPokemon1: PokemonDetails = {
+  id: 1,
+  name: 'Pikachu',
+  height: 4,
+  weight: 60,
+  sprites: { other: { 'official-artwork': { front_default: '' } } },
+  types: [{ type: { name: 'electric' } }],
+  description: 'Pikachu desc',
+  species: { url: '' },
+  stats: [],
+  abilities: [],
+};
+
+const mockPokemon2: PokemonDetails = {
+  id: 2,
+  name: 'Charmander',
+  height: 6,
+  weight: 85,
+  sprites: { other: { 'official-artwork': { front_default: '' } } },
+  types: [{ type: { name: 'fire' } }],
+  description: 'Charmander desc',
+  species: { url: '' },
+  stats: [],
+  abilities: [],
+};
 
 describe('Flyout Component', () => {
-  const onUnselectAllMock = vi.fn();
-  const onDownloadMock = vi.fn();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    act(() => {
+      useSelectedItemsStore.setState({ selectedPokemons: [] });
+    });
+  });
 
-  it('should not render if selectedCount is 0', () => {
-    const { container } = render(
-      <Flyout
-        selectedCount={0}
-        onUnselectAll={onUnselectAllMock}
-        onDownload={onDownloadMock}
-      />
-    );
+  it('should not render if no items are selected', () => {
+    const { container } = render(<Flyout />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('should render correctly with 1 item selected', () => {
-    render(
-      <Flyout
-        selectedCount={1}
-        onUnselectAll={onUnselectAllMock}
-        onDownload={onDownloadMock}
-      />
-    );
-    expect(screen.getByText('1 item selected')).toBeInTheDocument();
+  it('should render correctly when items are selected', () => {
+    act(() => {
+      useSelectedItemsStore.setState({
+        selectedPokemons: [mockPokemon1, mockPokemon2],
+      });
+    });
+
+    render(<Flyout />);
+    expect(screen.getByText(/2 items selected/i)).toBeInTheDocument();
   });
 
-  it('should render correctly with multiple items selected', () => {
-    render(
-      <Flyout
-        selectedCount={5}
-        onUnselectAll={onUnselectAllMock}
-        onDownload={onDownloadMock}
-      />
-    );
-    expect(screen.getByText('5 items selected')).toBeInTheDocument();
-  });
+  it('should call unselectAll when the button is clicked', async () => {
+    act(() => {
+      useSelectedItemsStore.setState({
+        selectedPokemons: [mockPokemon1],
+      });
+    });
+    render(<Flyout />);
 
-  it('should call onUnselectAll when the button is clicked', async () => {
-    render(
-      <Flyout
-        selectedCount={5}
-        onUnselectAll={onUnselectAllMock}
-        onDownload={onDownloadMock}
-      />
-    );
     const unselectButton = screen.getByRole('button', {
       name: /unselect all/i,
     });
     await userEvent.click(unselectButton);
-    expect(onUnselectAllMock).toHaveBeenCalledTimes(1);
+
+    expect(useSelectedItemsStore.getState().selectedPokemons).toHaveLength(0);
   });
 
-  it('should call onDownload when the button is clicked', async () => {
-    render(
-      <Flyout
-        selectedCount={5}
-        onUnselectAll={onUnselectAllMock}
-        onDownload={onDownloadMock}
-      />
-    );
+  it('should call downloadCsvAction when the button is clicked', async () => {
+    const mockPokemons = [mockPokemon1];
+    act(() => {
+      useSelectedItemsStore.setState({ selectedPokemons: mockPokemons });
+    });
+    render(<Flyout />);
+
     const downloadButton = screen.getByRole('button', { name: /download/i });
     await userEvent.click(downloadButton);
-    expect(onDownloadMock).toHaveBeenCalledTimes(1);
+
+    expect(actions.downloadCsvAction).toHaveBeenCalledWith(mockPokemons);
   });
 });
