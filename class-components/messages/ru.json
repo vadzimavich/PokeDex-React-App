@@ -8,7 +8,9 @@
     "button": "Найти"
   },
   "Pagination": {
-    "page": "Страница {currentPage} из {totalPages}"
+    "page": "Страница {currentPage} из {totalPages}",
+    "prev": "← Назад",
+    "next": "Вперед →"
   },
   "Flyout": {
     "itemsSelected": "{count, plural, =1 {# элемент выбран} few {# элемента выбрано} other {# элементов выбрано}}",
@@ -18,8 +20,11 @@
   "AboutPage": {
     "title": "О Pokedex",
     "author": "Это приложение создано @vadzimavich.",
-    "course": "Это учебный проект для {link}.",
+    "course": "Это учебный проект для ",
     "courseLinkText": "курса RS School React",
     "back": "Вернуться на главную"
+  },
+  "DetailsPage": {
+    "backToList": "← Назад к списку"
   }
 }

@@ -1,4 +1,5 @@
-import type { PokemonDetails } from '../../app/types';
+import Image from 'next/image';
+import type { PokemonDetails } from '../../../app/types';
 import styles from './Card.module.css';
 
 interface CardProps {
@@ -46,7 +47,14 @@ const Card = ({
             #{pokemon.id.toString().padStart(3, '0')}
           </div>
           {imageUrl && (
-            <img src={imageUrl} alt={pokemon.name} className={styles.image} />
+            <Image
+              src={imageUrl}
+              alt={pokemon.name}
+              className={styles.image}
+              width={200}
+              height={200}
+              priority={pokemon.id < 21}
+            />
           )}
         </div>
         <div className={styles.info}>

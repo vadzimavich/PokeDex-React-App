@@ -12,6 +12,7 @@ import {
 
 import Main from '@/app/components/Main/Main';
 import Pagination from '@/app/components/Pagination/Pagination';
+import Flyout from '@/app/components/Flyout/Flyout';
 import type { PokemonDetails } from '@/app/types';
 
 const POKEMON_PER_PAGE = 20;
@@ -26,9 +27,13 @@ type InitialData =
   | null
   | undefined;
 
+type SerializableError = {
+  message: string;
+};
+
 interface HomePageClientProps {
   initialData: InitialData;
-  initialError: Error | null;
+  initialError: SerializableError | null;
   currentPage: number;
   searchTerm: string;
 }
@@ -88,15 +93,9 @@ export default function HomePageClient({
     router.push(`/details/${id}`);
   };
 
-  // TODO: closeDetails
-
   return (
     <div style={{ display: 'flex' }}>
-      <div
-        style={{ flex: 1, minWidth: 0 }}
-        // onClick={outlet ? closeDetails : undefined}
-        data-testid="main-panel"
-      >
+      <div style={{ flex: 1, minWidth: 0 }} data-testid="main-panel">
         <Main
           pokemons={pokemons}
           isLoading={isLoading}
@@ -112,7 +111,10 @@ export default function HomePageClient({
           hasPrev={!!data?.previous}
           currentPage={currentPage}
           totalPagesText={t('page', { currentPage, totalPages })}
+          prevText={t('prev')}
+          nextText={t('next')}
         />
+        <Flyout />
       </div>
     </div>
   );

@@ -8,7 +8,9 @@
     "button": "Search"
   },
   "Pagination": {
-    "page": "Page {currentPage} of {totalPages}"
+    "page": "Page {currentPage} of {totalPages}",
+    "prev": "← Prev",
+    "next": "Next →"
   },
   "Flyout": {
     "itemsSelected": "{count, plural, =1 {# item selected} other {# items selected}}",
@@ -18,8 +20,11 @@
   "AboutPage": {
     "title": "About Pokedex",
     "author": "This application was created by @vadzimavich.",
-    "course": "It's a learning project for the {link}.",
+    "course": "It's a learning project for the ",
     "courseLinkText": "RS School React Course",
     "back": "Back to Home"
+  },
+  "DetailsPage": {
+    "backToList": "← Back to list"
   }
 }

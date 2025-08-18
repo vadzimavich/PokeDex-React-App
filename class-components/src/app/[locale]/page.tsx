@@ -15,7 +15,7 @@ export default async function HomePage({
   const searchTerm = String(searchParams.search || '');
 
   let initialData = null;
-  let error = null;
+  let error: Error | null = null;
 
   try {
     if (searchTerm) {
@@ -35,10 +35,12 @@ export default async function HomePage({
     error = e instanceof Error ? e : new Error('An unknown error occurred');
   }
 
+  const serializableError = error ? { message: error.message } : null;
+
   return (
     <HomePageClient
       initialData={initialData}
-      initialError={error}
+      initialError={serializableError}
       currentPage={currentPage}
       searchTerm={searchTerm}
     />

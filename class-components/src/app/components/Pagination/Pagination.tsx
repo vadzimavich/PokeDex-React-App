@@ -9,6 +9,8 @@ interface PaginationProps {
   hasNext: boolean;
   currentPage: number;
   totalPagesText: string;
+  prevText: string;
+  nextText: string;
 }
 
 const Pagination = ({
@@ -17,6 +19,8 @@ const Pagination = ({
   hasPrev,
   hasNext,
   totalPagesText,
+  prevText,
+  nextText,
 }: PaginationProps) => {
   return (
     <div className={styles.pagination}>
@@ -27,7 +31,7 @@ const Pagination = ({
         }}
         disabled={!hasPrev}
       >
-        ← Prev
+        {prevText}
       </button>
       <span>{totalPagesText}</span>
       <button
@@ -37,7 +41,7 @@ const Pagination = ({
         }}
         disabled={!hasNext}
       >
-        Next →
+        {nextText}
       </button>
     </div>
   );

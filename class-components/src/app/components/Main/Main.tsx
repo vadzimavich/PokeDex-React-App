@@ -1,12 +1,12 @@
 import CardList from '../CardList/CardList';
 import SkeletonCard from '../SkeletonCard/SkeletonCard';
-import type { PokemonDetails } from '../../app/types';
+import type { PokemonDetails } from '../../../app/types';
 import cardListStyles from '../CardList/CardList.module.css';
 
 interface MainProps {
   pokemons: PokemonDetails[];
   isLoading: boolean;
-  error: Error | null;
+  error: { message: string } | null;
   onCardClick: (id: number) => void;
   selectedIds: Set<number>;
   onToggleSelect: (pokemon: PokemonDetails) => void;
