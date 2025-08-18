@@ -1,0 +1,35 @@
+{
+  "Header": {
+    "home": "Home",
+    "about": "About"
+  },
+  "Search": {
+    "placeholder": "Search...",
+    "button": "Search"
+  },
+  "Pagination": {
+    "page": "Page {currentPage} of {totalPages}",
+    "prev": "← Prev",
+    "next": "Next →"
+  },
+  "Flyout": {
+    "itemsSelected": "{count, plural, =1 {# item selected} other {# items selected}}",
+    "unselectAll": "Unselect all",
+    "download": "Download"
+  },
+  "AboutPage": {
+    "title": "About Pokedex",
+    "author": "This application was created by @vadzimavich.",
+    "course": "It's a learning project for the ",
+    "courseLinkText": "RS School React Course",
+    "back": "Back to Home"
+  },
+  "DetailsPage": {
+    "backToList": "← Back to list"
+  },
+  "NotFound": {
+    "title": "Page Not Found",
+    "description": "Oops! The page you are looking for does not exist...",
+    "backToHome": "Go back to the homepage"
+  }
+}
