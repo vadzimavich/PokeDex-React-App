@@ -3,6 +3,8 @@
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema, type FormValues } from '@/app/lib/schema';
+import { checkPasswordStrength } from '@/app/lib/utils';
+import PasswordStrengthMeter from '../PasswordStrengthMeter/PasswordStrengthMeter';
 import styles from './RHFForm.module.css';
 import { useEffect, useState } from 'react';
 import { type StoredFormData } from '@/app/store/formStore';
@@ -39,6 +41,9 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
     },
   });
 
+  const password = watch('password');
+  const strengthScore = checkPasswordStrength(password || '');
+
   const [picturePreview, setPicturePreview] = useState<string | null>(null);
   const pictureFile = watch('picture');
 
@@ -71,32 +76,38 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
       className={styles.form}
       noValidate
     >
+      {/* Name */}
       <div className={styles.field}>
         <label htmlFor="name-rhf">Name</label>
         <input id="name-rhf" type="text" {...register('name')} />
         {errors.name && <p className={styles.error}>{errors.name.message}</p>}
       </div>
 
+      {/* Age */}
       <div className={styles.field}>
         <label htmlFor="age-rhf">Age</label>
         <input id="age-rhf" type="text" {...register('age')} />
         {errors.age && <p className={styles.error}>{errors.age.message}</p>}
       </div>
 
+      {/* Email */}
       <div className={styles.field}>
         <label htmlFor="email-rhf">Email</label>
         <input id="email-rhf" type="email" {...register('email')} />
         {errors.email && <p className={styles.error}>{errors.email.message}</p>}
       </div>
 
+      {/* Password */}
       <div className={styles.field}>
         <label htmlFor="password-rhf">Password</label>
         <input id="password-rhf" type="password" {...register('password')} />
+        <PasswordStrengthMeter score={strengthScore} />
         {errors.password && (
           <p className={styles.error}>{errors.password.message}</p>
         )}
       </div>
 
+      {/* Confirm Password */}
       <div className={styles.field}>
         <label htmlFor="confirmPassword-rhf">Confirm Password</label>
         <input
@@ -109,6 +120,7 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
         )}
       </div>
 
+      {/* Gender */}
       <div className={styles.field}>
         <label htmlFor="gender-rhf">Gender</label>
         <select id="gender-rhf" defaultValue="" {...register('gender')}>
@@ -124,6 +136,7 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
         )}
       </div>
 
+      {/* Country */}
       <div className={styles.field}>
         <label htmlFor="country-rhf">Country</label>
         <input id="country-rhf" type="text" {...register('country')} />
@@ -132,6 +145,7 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
         )}
       </div>
 
+      {/* Profile Pic */}
       <div className={styles.field}>
         <label htmlFor="picture-rhf">Profile Picture</label>
         <input
@@ -148,6 +162,7 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
         )}
       </div>
 
+      {/* Accept Checkbox */}
       <div className={styles.fieldCheckbox}>
         <input id="terms-rhf" type="checkbox" {...register('terms')} />
         <label htmlFor="terms-rhf">I accept the Terms and Conditions</label>

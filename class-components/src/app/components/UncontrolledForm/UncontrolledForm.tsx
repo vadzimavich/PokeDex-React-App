@@ -2,6 +2,8 @@
 
 import { useRef, useState, type FormEvent } from 'react';
 import { formSchema, type FormValues } from '@/app/lib/schema';
+import { checkPasswordStrength } from '@/app/lib/utils';
+import PasswordStrengthMeter from '../PasswordStrengthMeter/PasswordStrengthMeter';
 import styles from './UncontrolledForm.module.css';
 import { type StoredFormData } from '@/app/store/formStore';
 
@@ -32,6 +34,7 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [picturePreview, setPicturePreview] = useState<string | null>(null);
+  const [password, setPassword] = useState('');
 
   const handlePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -82,26 +85,32 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
     onSubmit(finalData);
   };
 
+  const strengthScore = checkPasswordStrength(password);
+
   return (
     <form onSubmit={handleSubmit} className={styles.form} noValidate>
+      {/* Name */}
       <div className={styles.field}>
         <label htmlFor="name">Name</label>
         <input id="name" name="name" type="text" ref={nameRef} />
         {errors.name && <p className={styles.error}>{errors.name}</p>}
       </div>
 
+      {/* Age */}
       <div className={styles.field}>
         <label htmlFor="age">Age</label>
         <input id="age" name="age" type="text" ref={ageRef} />
         {errors.age && <p className={styles.error}>{errors.age}</p>}
       </div>
 
+      {/* Email */}
       <div className={styles.field}>
         <label htmlFor="email">Email</label>
         <input id="email" name="email" type="email" ref={emailRef} />
         {errors.email && <p className={styles.error}>{errors.email}</p>}
       </div>
 
+      {/* Password */}
       <div className={styles.field}>
         <label htmlFor="password">Password</label>
         <input
@@ -109,10 +118,13 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
           name="password"
           type="password"
           ref={passwordRef}
+          onChange={(e) => setPassword(e.target.value)}
         />
+        <PasswordStrengthMeter score={strengthScore} />
         {errors.password && <p className={styles.error}>{errors.password}</p>}
       </div>
 
+      {/* Confirm Password */}
       <div className={styles.field}>
         <label htmlFor="confirmPassword">Confirm Password</label>
         <input
@@ -126,6 +138,7 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
         )}
       </div>
 
+      {/* Gender */}
       <div className={styles.field}>
         <label htmlFor="gender">Gender</label>
         <select id="gender" name="gender" ref={genderRef} defaultValue="">
@@ -139,12 +152,14 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
         {errors.gender && <p className={styles.error}>{errors.gender}</p>}
       </div>
 
+      {/* Country */}
       <div className={styles.field}>
         <label htmlFor="country">Country</label>
         <input id="country" name="country" type="text" ref={countryRef} />
         {errors.country && <p className={styles.error}>{errors.country}</p>}
       </div>
 
+      {/* Profile Pic */}
       <div className={styles.field}>
         <label htmlFor="picture">Profile Picture</label>
         <input
@@ -161,6 +176,7 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
         {errors.picture && <p className={styles.error}>{errors.picture}</p>}
       </div>
 
+      {/* Accept Checkbox */}
       <div className={styles.fieldCheckbox}>
         <input id="terms" name="terms" type="checkbox" ref={termsRef} />
         <label htmlFor="terms">I accept the Terms and Conditions</label>
