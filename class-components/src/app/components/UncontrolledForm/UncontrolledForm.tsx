@@ -38,7 +38,9 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
   const handlePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setPicturePreview(URL.createObjectURL(file));
+      const previewUrl = URL.createObjectURL(file);
+      setPicturePreview(previewUrl);
+      return () => URL.revokeObjectURL(previewUrl);
     } else {
       setPicturePreview(null);
     }
@@ -46,7 +48,6 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setErrors({});
 
     const formData = {
       name: nameRef.current?.value ?? '',
@@ -70,6 +71,8 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
       setErrors(formattedErrors);
       return;
     }
+
+    setErrors({});
 
     const pictureBase64 = await toBase64(validationResult.data.picture[0]);
     const { confirmPassword: _confirmPassword, ...dataToSubmit } =
@@ -102,8 +105,8 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
         {errors.age && <p className={styles.error}>{errors.age}</p>}
       </div>
 
-      {/* Email */}
-      <div className={styles.field}>
+      {/* Email (fullWidth) */}
+      <div className={`${styles.field} ${styles.fullWidth}`}>
         <label htmlFor="email">Email</label>
         <input id="email" name="email" type="email" ref={emailRef} />
         {errors.email && <p className={styles.error}>{errors.email}</p>}
@@ -163,8 +166,8 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
         {errors.country && <p className={styles.error}>{errors.country}</p>}
       </div>
 
-      {/* Profile Pic */}
-      <div className={styles.field}>
+      {/* Profile Picture (fullWidth) */}
+      <div className={`${styles.field} ${styles.fullWidth}`}>
         <label htmlFor="picture">Profile Picture</label>
         <input
           id="picture"
@@ -180,16 +183,19 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
         {errors.picture && <p className={styles.error}>{errors.picture}</p>}
       </div>
 
-      {/* Accept Checkbox */}
-      <div className={styles.fieldCheckbox}>
+      {/* Terms Checkbox (fullWidth) */}
+      <div className={`${styles.fieldCheckbox} ${styles.fullWidth}`}>
         <input id="terms" name="terms" type="checkbox" ref={termsRef} />
         <label htmlFor="terms">I accept the Terms and Conditions</label>
         {errors.terms && <p className={styles.error}>{errors.terms}</p>}
       </div>
 
-      <button type="submit" className={styles.submitButton}>
-        Submit
-      </button>
+      {/* Submit Button (fullWidth) */}
+      <div className={styles.fullWidth}>
+        <button type="submit" className={styles.submitButton}>
+          Submit
+        </button>
+      </div>
     </form>
   );
 }

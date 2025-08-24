@@ -7,39 +7,77 @@ export const formSchema = z
   .object({
     name: z
       .string()
+      .trim()
       .min(1, { message: 'Name is required.' })
-      .regex(/^[A-Z]/, { message: 'Name must start with a capital letter.' }),
+      .refine(
+        (val) => {
+          if (val.length === 0) return true;
+          return /^[A-Z]/.test(val);
+        },
+        {
+          message: 'Name must start with a capital letter.',
+        }
+      ),
 
     age: z
       .string()
+      .trim()
       .min(1, { message: 'Age is required.' })
-      .refine((val) => !isNaN(parseFloat(val)), {
-        message: 'Age must be a number.',
-      })
-      .refine((val) => parseFloat(val) >= 0, {
-        message: 'Age cannot be negative.',
-      }),
+      .refine(
+        (val) => {
+          if (val.length === 0) return true;
+          return !isNaN(parseFloat(val));
+        },
+        {
+          message: 'Age must be a number.',
+        }
+      )
+      .refine(
+        (val) => {
+          if (val.length === 0) return true;
+          return parseFloat(val) >= 0;
+        },
+        {
+          message: 'Age cannot be negative.',
+        }
+      ),
 
     email: z
       .string()
+      .trim()
       .min(1, { message: 'Email is required.' })
-      .email({ message: 'Invalid email address.' }),
+      .refine(
+        (val) => {
+          if (val.length === 0) return true;
+          return z.string().email().safeParse(val).success;
+        },
+        {
+          message: 'Invalid email address.',
+        }
+      ),
 
     password: z
       .string()
-      .min(8, { message: 'Password must be at least 8 characters long.' })
-      .regex(/[A-Z]/, {
+      .min(1, { message: 'Password is required.' })
+      .refine((val) => val.length === 0 || val.length >= 8, {
+        message: 'Password must be at least 8 characters long.',
+      })
+      .refine((val) => val.length === 0 || /[A-Z]/.test(val), {
         message: 'Password must contain at least one uppercase letter.',
       })
-      .regex(/[a-z]/, {
+      .refine((val) => val.length === 0 || /[a-z]/.test(val), {
         message: 'Password must contain at least one lowercase letter.',
       })
-      .regex(/[0-9]/, { message: 'Password must contain at least one number.' })
-      .regex(/[^A-Za-z0-9]/, {
+      .refine((val) => val.length === 0 || /[0-9]/.test(val), {
+        message: 'Password must contain at least one number.',
+      })
+      .refine((val) => val.length === 0 || /[^A-Za-z0-9]/.test(val), {
         message: 'Password must contain at least one special character.',
       }),
 
-    confirmPassword: z.string(),
+    confirmPassword: z
+      .string()
+      .min(1, { message: 'Please confirm your password.' }),
 
     gender: z.enum(['male', 'female', 'other'], {
       message: 'Please select a gender.',

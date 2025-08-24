@@ -90,8 +90,8 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
         {errors.age && <p className={styles.error}>{errors.age.message}</p>}
       </div>
 
-      {/* Email */}
-      <div className={styles.field}>
+      {/* Email (fullWidth) */}
+      <div className={`${styles.field} ${styles.fullWidth}`}>
         <label htmlFor="email-rhf">Email</label>
         <input id="email-rhf" type="email" {...register('email')} />
         {errors.email && <p className={styles.error}>{errors.email.message}</p>}
@@ -157,8 +157,8 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
         )}
       </div>
 
-      {/* Profile Pic */}
-      <div className={styles.field}>
+      {/* Profile Pic (fullWidth) */}
+      <div className={`${styles.field} ${styles.fullWidth}`}>
         <label htmlFor="picture-rhf">Profile Picture</label>
         <input
           id="picture-rhf"
@@ -174,16 +174,23 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
         )}
       </div>
 
-      {/* Accept Checkbox */}
-      <div className={styles.fieldCheckbox}>
+      {/* Accept Checkbox (fullWidth) */}
+      <div className={`${styles.fieldCheckbox} ${styles.fullWidth}`}>
         <input id="terms-rhf" type="checkbox" {...register('terms')} />
         <label htmlFor="terms-rhf">I accept the Terms and Conditions</label>
         {errors.terms && <p className={styles.error}>{errors.terms.message}</p>}
       </div>
 
-      <button type="submit" className={styles.submitButton} disabled={!isValid}>
-        Submit
-      </button>
+      {/* Submit Button (fullWidth) */}
+      <div className={styles.fullWidth}>
+        <button
+          type="submit"
+          className={styles.submitButton}
+          disabled={!isValid}
+        >
+          Submit
+        </button>
+      </div>
     </form>
   );
 }

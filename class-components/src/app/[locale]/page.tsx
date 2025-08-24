@@ -5,6 +5,7 @@ import Modal from '../components/Modal/Modal';
 import UncontrolledForm from '../components/UncontrolledForm/UncontrolledForm';
 import RHFForm from '../components/RHFForm/RHFForm';
 import DataCard from '../components/DataCard/DataCard';
+import styles from './HomePage.module.css';
 
 export default function HomePage() {
   const {
@@ -30,16 +31,24 @@ export default function HomePage() {
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-        <button onClick={() => openModal('uncontrolled')}>
+    <>
+      <div className={styles.controlsContainer}>
+        <button
+          className={styles.actionButton}
+          onClick={() => openModal('uncontrolled')}
+        >
           Open Uncontrolled Form
         </button>
-        <button onClick={() => openModal('rhf')}>Open React Hook Form</button>
+        <button
+          className={styles.actionButton}
+          onClick={() => openModal('rhf')}
+        >
+          Open React Hook Form
+        </button>
       </div>
 
       <h2>Submitted Data:</h2>
-      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+      <div className={styles.dataGrid}>
         {formData.length > 0 ? (
           formData.map((data) => (
             <DataCard
@@ -60,6 +69,6 @@ export default function HomePage() {
         )}
         {modalContent === 'rhf' && <RHFForm onSubmit={handleFormSubmit} />}
       </Modal>
-    </div>
+    </>
   );
 }
