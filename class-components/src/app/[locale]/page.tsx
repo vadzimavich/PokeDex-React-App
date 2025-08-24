@@ -3,8 +3,7 @@
 import { useFormStore, type StoredFormData } from '../store/formStore';
 import Modal from '../components/Modal/Modal';
 import UncontrolledForm from '../components/UncontrolledForm/UncontrolledForm';
-
-const RHFForm = () => <div>React Hook Form Content</div>;
+import RHFForm from '../components/RHFForm/RHFForm';
 
 const DataCard = ({ data }: { data: StoredFormData }) => (
   <div
@@ -73,7 +72,7 @@ export default function HomePage() {
         {modalContent === 'uncontrolled' && (
           <UncontrolledForm onSubmit={handleFormSubmit} />
         )}
-        {modalContent === 'rhf' && <RHFForm />}
+        {modalContent === 'rhf' && <RHFForm onSubmit={handleFormSubmit} />}
       </Modal>
     </div>
   );

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png'];
 
 export const formSchema = z
@@ -12,11 +12,13 @@ export const formSchema = z
 
     age: z
       .string()
-      .refine((val) => val.trim() !== '' && !isNaN(parseFloat(val)), {
+      .min(1, { message: 'Age is required.' })
+      .refine((val) => !isNaN(parseFloat(val)), {
         message: 'Age must be a number.',
       })
-      .transform(Number)
-      .pipe(z.number().min(0, { message: 'Age cannot be negative.' })),
+      .refine((val) => parseFloat(val) >= 0, {
+        message: 'Age cannot be negative.',
+      }),
 
     email: z
       .string()
@@ -43,7 +45,7 @@ export const formSchema = z
       message: 'Please select a gender.',
     }),
 
-    terms: z.literal(true, {
+    terms: z.boolean().refine((val) => val === true, {
       message: 'You must accept the Terms and Conditions.',
     }),
 
@@ -54,15 +56,14 @@ export const formSchema = z
           files instanceof FileList && files.length > 0,
         'Profile picture is required.'
       )
-      .refine(
-        (files): files is FileList => files[0].size <= MAX_FILE_SIZE,
-        `Max file size is 5MB.`
-      )
-      .refine(
-        (files): files is FileList =>
-          ACCEPTED_IMAGE_TYPES.includes(files[0].type),
-        'Only .jpg and .png formats are supported.'
-      ),
+      .refine((files): files is FileList => {
+        if (!files || files.length === 0) return true;
+        return files[0].size <= MAX_FILE_SIZE;
+      }, `Max file size is 5MB.`)
+      .refine((files): files is FileList => {
+        if (!files || files.length === 0) return true;
+        return ACCEPTED_IMAGE_TYPES.includes(files[0].type);
+      }, 'Only .jpg and .png formats are supported.'),
 
     country: z.string().min(1, { message: 'Country is required.' }),
   })

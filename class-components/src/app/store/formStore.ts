@@ -1,8 +1,12 @@
 import { create } from 'zustand';
 import type { FormValues } from '../lib/schema';
 
-export type StoredFormData = Omit<FormValues, 'confirmPassword' | 'picture'> & {
+export type StoredFormData = Omit<
+  FormValues,
+  'confirmPassword' | 'picture' | 'age'
+> & {
   picture: string;
+  age: number;
 };
 
 type FormType = 'uncontrolled' | 'rhf' | null;

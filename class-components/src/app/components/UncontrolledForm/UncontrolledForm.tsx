@@ -3,6 +3,7 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { formSchema, type FormValues } from '@/app/lib/schema';
 import styles from './UncontrolledForm.module.css';
+import { type StoredFormData } from '@/app/store/formStore';
 
 const toBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -15,7 +16,7 @@ const toBase64 = (file: File): Promise<string> =>
 type FormErrors = Partial<Record<keyof FormValues, string>>;
 
 interface UncontrolledFormProps {
-  onSubmit: (data: Omit<FormValues, 'confirmPassword'>) => void;
+  onSubmit: (data: StoredFormData) => void;
 }
 
 export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
@@ -69,40 +70,38 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
     }
 
     const pictureBase64 = await toBase64(validationResult.data.picture[0]);
+    const { confirmPassword: _confirmPassword, ...dataToSubmit } =
+      validationResult.data;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { confirmPassword, ...dataToSubmit } = validationResult.data;
-
-    onSubmit({
+    const finalData: StoredFormData = {
       ...dataToSubmit,
+      age: Number(dataToSubmit.age),
       picture: pictureBase64,
-    });
+    };
+
+    onSubmit(finalData);
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form} noValidate>
-      {/* Name */}
       <div className={styles.field}>
         <label htmlFor="name">Name</label>
         <input id="name" name="name" type="text" ref={nameRef} />
         {errors.name && <p className={styles.error}>{errors.name}</p>}
       </div>
 
-      {/* Age */}
       <div className={styles.field}>
         <label htmlFor="age">Age</label>
-        <input id="age" name="age" type="number" ref={ageRef} />
+        <input id="age" name="age" type="text" ref={ageRef} />
         {errors.age && <p className={styles.error}>{errors.age}</p>}
       </div>
 
-      {/* Email */}
       <div className={styles.field}>
         <label htmlFor="email">Email</label>
         <input id="email" name="email" type="email" ref={emailRef} />
         {errors.email && <p className={styles.error}>{errors.email}</p>}
       </div>
 
-      {/* Password */}
       <div className={styles.field}>
         <label htmlFor="password">Password</label>
         <input
@@ -114,7 +113,6 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
         {errors.password && <p className={styles.error}>{errors.password}</p>}
       </div>
 
-      {/* Confirm Password */}
       <div className={styles.field}>
         <label htmlFor="confirmPassword">Confirm Password</label>
         <input
@@ -128,7 +126,6 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
         )}
       </div>
 
-      {/* Gender */}
       <div className={styles.field}>
         <label htmlFor="gender">Gender</label>
         <select id="gender" name="gender" ref={genderRef} defaultValue="">
@@ -142,14 +139,12 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
         {errors.gender && <p className={styles.error}>{errors.gender}</p>}
       </div>
 
-      {/* Country */}
       <div className={styles.field}>
         <label htmlFor="country">Country</label>
         <input id="country" name="country" type="text" ref={countryRef} />
         {errors.country && <p className={styles.error}>{errors.country}</p>}
       </div>
 
-      {/* Picture */}
       <div className={styles.field}>
         <label htmlFor="picture">Profile Picture</label>
         <input
@@ -166,7 +161,6 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
         {errors.picture && <p className={styles.error}>{errors.picture}</p>}
       </div>
 
-      {/* Terms */}
       <div className={styles.fieldCheckbox}>
         <input id="terms" name="terms" type="checkbox" ref={termsRef} />
         <label htmlFor="terms">I accept the Terms and Conditions</label>
