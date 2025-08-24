@@ -3,21 +3,13 @@
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema, type FormValues } from '@/app/lib/schema';
-import { checkPasswordStrength } from '@/app/lib/utils';
+import { checkPasswordStrength, toBase64 } from '@/app/lib/utils';
 import PasswordStrengthMeter from '../PasswordStrengthMeter/PasswordStrengthMeter';
 import styles from './RHFForm.module.css';
 import { useEffect, useState } from 'react';
 import { type StoredFormData } from '@/app/store/formStore';
 import Autocomplete from '../Autocomplete/Autocomplete';
 import { useFormStore } from '@/app/store/formStore';
-
-const toBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
 
 interface RHFFormProps {
   onSubmit: (data: Omit<StoredFormData, 'id'>) => void;

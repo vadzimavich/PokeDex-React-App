@@ -1,22 +1,13 @@
 'use client';
 
-import { useRef, useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent, useEffect } from 'react';
 import { formSchema, type FormValues } from '@/app/lib/schema';
-import { checkPasswordStrength } from '@/app/lib/utils';
+import { checkPasswordStrength, toBase64 } from '@/app/lib/utils';
 import PasswordStrengthMeter from '../PasswordStrengthMeter/PasswordStrengthMeter';
 import styles from './UncontrolledForm.module.css';
 import { type StoredFormData } from '@/app/store/formStore';
 import Autocomplete from '../Autocomplete/Autocomplete';
 import { useFormStore } from '@/app/store/formStore';
-import { useEffect } from 'react';
-
-const toBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
 
 type FormErrors = Partial<Record<keyof FormValues, string>>;
 

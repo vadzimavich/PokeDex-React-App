@@ -1,5 +1,5 @@
 import { fetch, Headers, Request, Response } from 'undici';
-import { vi, afterEach } from 'vitest';
+import { vi, beforeAll, afterEach } from 'vitest';
 
 Object.assign(globalThis, { fetch, Headers, Request, Response });
 import '@testing-library/jest-dom';
@@ -10,6 +10,12 @@ Object.defineProperty(window, 'scrollTo', {
 });
 window.URL.createObjectURL = vi.fn(() => 'mock-blob-url');
 window.URL.revokeObjectURL = vi.fn();
+
+beforeAll(() => {
+  const modalRoot = document.createElement('div');
+  modalRoot.setAttribute('id', 'modal-root');
+  document.body.appendChild(modalRoot);
+});
 
 afterEach(() => {
   localStorage.clear();

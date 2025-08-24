@@ -3,6 +3,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Header from './Header';
 
 vi.mock('../../../navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+  }),
   usePathname: () => '/',
   Link: ({ href, children }: { href: string; children: React.ReactNode }) => (
     <a href={href}>{children}</a>
