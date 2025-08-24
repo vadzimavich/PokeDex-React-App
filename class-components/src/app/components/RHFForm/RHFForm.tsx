@@ -20,7 +20,7 @@ const toBase64 = (file: File): Promise<string> =>
   });
 
 interface RHFFormProps {
-  onSubmit: (data: StoredFormData) => void;
+  onSubmit: (data: Omit<StoredFormData, 'id'>) => void;
 }
 
 export default function RHFForm({ onSubmit }: RHFFormProps) {
@@ -69,7 +69,7 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
     const pictureBase64 = await toBase64(data.picture[0]);
     const { confirmPassword: _confirmPassword, ...dataToSubmit } = data;
 
-    const finalData: StoredFormData = {
+    const finalData: Omit<StoredFormData, 'id'> = {
       ...dataToSubmit,
       age: Number(dataToSubmit.age),
       picture: pictureBase64,

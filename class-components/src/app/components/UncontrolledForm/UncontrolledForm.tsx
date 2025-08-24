@@ -21,7 +21,7 @@ const toBase64 = (file: File): Promise<string> =>
 type FormErrors = Partial<Record<keyof FormValues, string>>;
 
 interface UncontrolledFormProps {
-  onSubmit: (data: StoredFormData) => void;
+  onSubmit: (data: Omit<StoredFormData, 'id'>) => void;
 }
 
 export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
@@ -84,7 +84,7 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
     const { confirmPassword: _confirmPassword, ...dataToSubmit } =
       validationResult.data;
 
-    const finalData: StoredFormData = {
+    const finalData: Omit<StoredFormData, 'id'> = {
       ...dataToSubmit,
       age: Number(dataToSubmit.age),
       picture: pictureBase64,

@@ -5,6 +5,7 @@ export type StoredFormData = Omit<
   FormValues,
   'confirmPassword' | 'picture' | 'age'
 > & {
+  id: string;
   picture: string;
   age: number;
 };
@@ -23,10 +24,12 @@ interface FormState {
   formData: StoredFormData[];
   countries: Country[];
   isLoadingCountries: boolean;
+  newlyAddedId: string | null;
   openModal: (content: FormType) => void;
   closeModal: () => void;
-  addFormData: (data: StoredFormData) => void;
+  addFormData: (data: Omit<StoredFormData, 'id'>) => void;
   fetchCountries: () => Promise<void>;
+  clearNewlyAddedId: () => void;
 }
 
 export const useFormStore = create<FormState>((set, get) => ({
@@ -35,23 +38,27 @@ export const useFormStore = create<FormState>((set, get) => ({
   formData: [],
   countries: [],
   isLoadingCountries: false,
+  newlyAddedId: null,
   openModal: (content) => set({ isModalOpen: true, modalContent: content }),
   closeModal: () => set({ isModalOpen: false, modalContent: null }),
-  addFormData: (data) =>
-    set((state) => ({ formData: [...state.formData, data] })),
+  addFormData: (data) => {
+    const newId = Date.now().toString();
+    const newEntry: StoredFormData = { ...data, id: newId };
+    set((state) => ({
+      formData: [...state.formData, newEntry],
+      newlyAddedId: newId,
+    }));
+  },
   fetchCountries: async () => {
     if (get().countries.length > 0 || get().isLoadingCountries) {
       return;
     }
-
     set({ isLoadingCountries: true });
     try {
       const response = await fetch(
         'https://restcountries.com/v3.1/all?fields=name'
       );
-      if (!response.ok) {
-        throw new Error('Failed to fetch countries');
-      }
+      if (!response.ok) throw new Error('Failed to fetch countries');
       const data: Country[] = await response.json();
       const sortedData = data.sort((a, b) =>
         a.name.common.localeCompare(b.name.common)
@@ -62,4 +69,5 @@ export const useFormStore = create<FormState>((set, get) => ({
       set({ isLoadingCountries: false });
     }
   },
+  clearNewlyAddedId: () => set({ newlyAddedId: null }),
 }));

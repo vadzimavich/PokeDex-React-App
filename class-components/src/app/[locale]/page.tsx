@@ -4,39 +4,18 @@ import { useFormStore, type StoredFormData } from '../store/formStore';
 import Modal from '../components/Modal/Modal';
 import UncontrolledForm from '../components/UncontrolledForm/UncontrolledForm';
 import RHFForm from '../components/RHFForm/RHFForm';
-
-const DataCard = ({ data }: { data: StoredFormData }) => (
-  <div
-    style={{
-      border: '1px solid #555',
-      borderRadius: '8px',
-      padding: '1rem',
-      width: '300px',
-    }}
-  >
-    <h4>{data.name}</h4>
-    <p>Age: {data.age}</p>
-    <p>Email: {data.email}</p>
-    <p>Country: {data.country}</p>
-    <p>Gender: {data.gender}</p>
-    {data.picture && (
-      <img
-        src={data.picture}
-        alt={data.name}
-        style={{ maxWidth: '100%', borderRadius: '4px' }}
-      />
-    )}
-  </div>
-);
+import DataCard from '../components/DataCard/DataCard';
 
 export default function HomePage() {
   const {
     isModalOpen,
     modalContent,
     formData,
+    newlyAddedId,
     openModal,
     closeModal,
     addFormData,
+    clearNewlyAddedId,
   } = useFormStore();
 
   const getModalTitle = () => {
@@ -45,7 +24,7 @@ export default function HomePage() {
     return '';
   };
 
-  const handleFormSubmit = (data: StoredFormData) => {
+  const handleFormSubmit = (data: Omit<StoredFormData, 'id'>) => {
     addFormData(data);
     closeModal();
   };
@@ -62,7 +41,14 @@ export default function HomePage() {
       <h2>Submitted Data:</h2>
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
         {formData.length > 0 ? (
-          formData.map((data, index) => <DataCard key={index} data={data} />)
+          formData.map((data) => (
+            <DataCard
+              key={data.id}
+              data={data}
+              isNew={data.id === newlyAddedId}
+              onClearNew={clearNewlyAddedId}
+            />
+          ))
         ) : (
           <p>No data submitted yet.</p>
         )}
