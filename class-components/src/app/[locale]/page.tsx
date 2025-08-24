@@ -1,48 +1,31 @@
-import {
-  getPokemonList,
-  getPokemonFullDetails,
-} from '@/app/api/pokemonService';
-import HomePageClient from '@/app/components/HomePageClient/HomePageClient';
+'use client';
 
-const POKEMON_PER_PAGE = 20;
+import { useFormStore } from '../store/formStore';
+import Modal from '../components/Modal/Modal';
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const currentPage = parseInt(String(searchParams.page || '1'), 10);
-  const searchTerm = String(searchParams.search || '');
+const UncontrolledForm = () => <div>Uncontrolled Form Content</div>;
+const RHFForm = () => <div>React Hook Form Content</div>;
 
-  let initialData = null;
-  let error: Error | null = null;
+export default function HomePage() {
+  const { isModalOpen, modalContent, openModal, closeModal } = useFormStore();
 
-  try {
-    if (searchTerm) {
-      const pokemon = await getPokemonFullDetails(searchTerm.toLowerCase());
-      initialData = {
-        pokemons: [pokemon],
-        next: null,
-        previous: null,
-        count: 1,
-      };
-    } else {
-      const offset = (currentPage - 1) * POKEMON_PER_PAGE;
-      const url = `https://pokeapi.co/api/v2/pokemon?limit=${POKEMON_PER_PAGE}&offset=${offset}`;
-      initialData = await getPokemonList(url);
-    }
-  } catch (e) {
-    error = e instanceof Error ? e : new Error('An unknown error occurred');
-  }
-
-  const serializableError = error ? { message: error.message } : null;
+  const getModalTitle = () => {
+    if (modalContent === 'uncontrolled') return 'Uncontrolled Form';
+    if (modalContent === 'rhf') return 'React Hook Form';
+    return '';
+  };
 
   return (
-    <HomePageClient
-      initialData={initialData}
-      initialError={serializableError}
-      currentPage={currentPage}
-      searchTerm={searchTerm}
-    />
+    <div style={{ padding: '2rem', display: 'flex', gap: '1rem' }}>
+      <button onClick={() => openModal('uncontrolled')}>
+        Open Uncontrolled Form
+      </button>
+      <button onClick={() => openModal('rhf')}>Open React Hook Form</button>
+
+      <Modal isOpen={isModalOpen} onClose={closeModal} title={getModalTitle()}>
+        {modalContent === 'uncontrolled' && <UncontrolledForm />}
+        {modalContent === 'rhf' && <RHFForm />}
+      </Modal>
+    </div>
   );
 }

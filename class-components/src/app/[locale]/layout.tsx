@@ -22,6 +22,7 @@ export default async function LocaleLayout({
     <Providers locale={locale} messages={messages}>
       <Header />
       <main>{children}</main>
+      <div id="modal-root"></div>
     </Providers>
   );
 }
