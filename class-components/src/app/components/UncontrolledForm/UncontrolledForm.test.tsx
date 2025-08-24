@@ -36,11 +36,13 @@ describe('UncontrolledForm Component', () => {
     const submitButton = screen.getByRole('button', { name: /submit/i });
     await user.click(submitButton);
 
+    expect(await screen.findByText('Name is required.')).toBeInTheDocument();
+    expect(screen.getByText('Age is required.')).toBeInTheDocument();
+    expect(screen.getByText('Email is required.')).toBeInTheDocument();
+    expect(screen.getByText('Password is required.')).toBeInTheDocument();
     expect(
-      await screen.findByText('Name must start with a capital letter.')
+      screen.getByText('Please confirm your password.')
     ).toBeInTheDocument();
-    expect(screen.getByText('Age cannot be negative.')).toBeInTheDocument();
-    expect(screen.getByText('Invalid email address.')).toBeInTheDocument();
     expect(screen.getByText('Country is required.')).toBeInTheDocument();
     expect(
       screen.getByText('Profile picture is required.')
