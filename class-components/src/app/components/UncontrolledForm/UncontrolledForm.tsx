@@ -6,6 +6,9 @@ import { checkPasswordStrength } from '@/app/lib/utils';
 import PasswordStrengthMeter from '../PasswordStrengthMeter/PasswordStrengthMeter';
 import styles from './UncontrolledForm.module.css';
 import { type StoredFormData } from '@/app/store/formStore';
+import Autocomplete from '../Autocomplete/Autocomplete';
+import { useFormStore } from '@/app/store/formStore';
+import { useEffect } from 'react';
 
 const toBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -31,6 +34,11 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
   const termsRef = useRef<HTMLInputElement>(null);
   const pictureRef = useRef<HTMLInputElement>(null);
   const countryRef = useRef<HTMLInputElement>(null);
+
+  const { countries, fetchCountries } = useFormStore();
+  useEffect(() => {
+    fetchCountries();
+  }, [fetchCountries]);
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [picturePreview, setPicturePreview] = useState<string | null>(null);
@@ -155,7 +163,12 @@ export default function UncontrolledForm({ onSubmit }: UncontrolledFormProps) {
       {/* Country */}
       <div className={styles.field}>
         <label htmlFor="country">Country</label>
-        <input id="country" name="country" type="text" ref={countryRef} />
+        <Autocomplete
+          id="country"
+          name="country"
+          inputRef={countryRef}
+          suggestions={countries.map((c) => c.name.common)}
+        />
         {errors.country && <p className={styles.error}>{errors.country}</p>}
       </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm, type SubmitHandler } from 'react-hook-form';
+import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema, type FormValues } from '@/app/lib/schema';
 import { checkPasswordStrength } from '@/app/lib/utils';
@@ -8,6 +8,8 @@ import PasswordStrengthMeter from '../PasswordStrengthMeter/PasswordStrengthMete
 import styles from './RHFForm.module.css';
 import { useEffect, useState } from 'react';
 import { type StoredFormData } from '@/app/store/formStore';
+import Autocomplete from '../Autocomplete/Autocomplete';
+import { useFormStore } from '@/app/store/formStore';
 
 const toBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -27,6 +29,7 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
     handleSubmit,
     watch,
     formState: { errors, isValid },
+    control,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -40,6 +43,11 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
       terms: false,
     },
   });
+
+  const { countries, fetchCountries } = useFormStore();
+  useEffect(() => {
+    fetchCountries();
+  }, [fetchCountries]);
 
   const password = watch('password');
   const strengthScore = checkPasswordStrength(password || '');
@@ -139,7 +147,19 @@ export default function RHFForm({ onSubmit }: RHFFormProps) {
       {/* Country */}
       <div className={styles.field}>
         <label htmlFor="country-rhf">Country</label>
-        <input id="country-rhf" type="text" {...register('country')} />
+        <Controller
+          name="country"
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              id="country-rhf"
+              name={field.name}
+              value={field.value}
+              onChange={field.onChange}
+              suggestions={countries.map((c) => c.name.common)}
+            />
+          )}
+        />
         {errors.country && (
           <p className={styles.error}>{errors.country.message}</p>
         )}
