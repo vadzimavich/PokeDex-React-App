@@ -1,48 +1,74 @@
-import {
-  getPokemonList,
-  getPokemonFullDetails,
-} from '@/app/api/pokemonService';
-import HomePageClient from '@/app/components/HomePageClient/HomePageClient';
+'use client';
 
-const POKEMON_PER_PAGE = 20;
+import { useFormStore, type StoredFormData } from '../store/formStore';
+import Modal from '../components/Modal/Modal';
+import UncontrolledForm from '../components/UncontrolledForm/UncontrolledForm';
+import RHFForm from '../components/RHFForm/RHFForm';
+import DataCard from '../components/DataCard/DataCard';
+import styles from './HomePage.module.css';
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const currentPage = parseInt(String(searchParams.page || '1'), 10);
-  const searchTerm = String(searchParams.search || '');
+export default function HomePage() {
+  const {
+    isModalOpen,
+    modalContent,
+    formData,
+    newlyAddedId,
+    openModal,
+    closeModal,
+    addFormData,
+    clearNewlyAddedId,
+  } = useFormStore();
 
-  let initialData = null;
-  let error: Error | null = null;
+  const getModalTitle = () => {
+    if (modalContent === 'uncontrolled') return 'Uncontrolled Form';
+    if (modalContent === 'rhf') return 'React Hook Form';
+    return '';
+  };
 
-  try {
-    if (searchTerm) {
-      const pokemon = await getPokemonFullDetails(searchTerm.toLowerCase());
-      initialData = {
-        pokemons: [pokemon],
-        next: null,
-        previous: null,
-        count: 1,
-      };
-    } else {
-      const offset = (currentPage - 1) * POKEMON_PER_PAGE;
-      const url = `https://pokeapi.co/api/v2/pokemon?limit=${POKEMON_PER_PAGE}&offset=${offset}`;
-      initialData = await getPokemonList(url);
-    }
-  } catch (e) {
-    error = e instanceof Error ? e : new Error('An unknown error occurred');
-  }
-
-  const serializableError = error ? { message: error.message } : null;
+  const handleFormSubmit = (data: Omit<StoredFormData, 'id'>) => {
+    addFormData(data);
+    closeModal();
+  };
 
   return (
-    <HomePageClient
-      initialData={initialData}
-      initialError={serializableError}
-      currentPage={currentPage}
-      searchTerm={searchTerm}
-    />
+    <>
+      <div className={styles.controlsContainer}>
+        <button
+          className={styles.actionButton}
+          onClick={() => openModal('uncontrolled')}
+        >
+          Open Uncontrolled Form
+        </button>
+        <button
+          className={styles.actionButton}
+          onClick={() => openModal('rhf')}
+        >
+          Open React Hook Form
+        </button>
+      </div>
+
+      <h2>Submitted Data:</h2>
+      <div className={styles.dataGrid}>
+        {formData.length > 0 ? (
+          formData.map((data) => (
+            <DataCard
+              key={data.id}
+              data={data}
+              isNew={data.id === newlyAddedId}
+              onClearNew={clearNewlyAddedId}
+            />
+          ))
+        ) : (
+          <p>No data submitted yet.</p>
+        )}
+      </div>
+
+      <Modal isOpen={isModalOpen} onClose={closeModal} title={getModalTitle()}>
+        {modalContent === 'uncontrolled' && (
+          <UncontrolledForm onSubmit={handleFormSubmit} />
+        )}
+        {modalContent === 'rhf' && <RHFForm onSubmit={handleFormSubmit} />}
+      </Modal>
+    </>
   );
 }

@@ -1,64 +1,97 @@
-import { render, screen } from '@/app/__tests__/test-utils';
-import { describe, it, expect, vi } from 'vitest';
-import { server } from '@/app/__tests__/server';
-import { http, HttpResponse } from 'msw';
+import { render, screen, act } from '@/app/__tests__/test-utils';
+import { describe, it, expect, beforeEach } from 'vitest';
+import userEvent from '@testing-library/user-event';
 import HomePage from './page';
-import type { HomePageClientProps } from '@/app/components/HomePageClient/HomePageClient';
+import { useFormStore, type StoredFormData } from '../store/formStore';
 
-vi.mock('@/app/components/HomePageClient/HomePageClient', () => ({
-  default: (props: HomePageClientProps) => (
-    <div data-testid="homepage-client" data-props={JSON.stringify(props)} />
-  ),
-}));
+const initialStoreState = useFormStore.getState();
 
-describe('HomePage (Server Component)', () => {
-  it('should fetch initial list data when no search term is provided', async () => {
-    const PagePromise = HomePage({ searchParams: {} });
-    render(await PagePromise);
-
-    const clientComponent = screen.getByTestId('homepage-client');
-    const props = JSON.parse(
-      clientComponent.getAttribute('data-props') || '{}'
-    );
-
-    expect(props.initialData.pokemons[0].name).toBe('bulbasaur');
-    expect(props.searchTerm).toBe('');
-    expect(props.currentPage).toBe(1);
+describe('HomePage Component', () => {
+  beforeEach(() => {
+    act(() => {
+      useFormStore.setState(initialStoreState);
+    });
   });
 
-  it('should fetch specific pokemon data when a search term is provided', async () => {
-    const PagePromise = HomePage({ searchParams: { search: 'ivysaur' } });
-    render(await PagePromise);
-
-    const clientComponent = screen.getByTestId('homepage-client');
-    const props = JSON.parse(
-      clientComponent.getAttribute('data-props') || '{}'
-    );
-
-    expect(props.initialData.pokemons[0].name).toBe('ivysaur');
-    expect(props.searchTerm).toBe('ivysaur');
-    expect(props.initialData.count).toBe(1);
+  it('should render initial state with no data', () => {
+    render(<HomePage />);
+    expect(screen.getByText('Submitted Data:')).toBeInTheDocument();
+    expect(screen.getByText('No data submitted yet.')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /open uncontrolled form/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /open react hook form/i })
+    ).toBeInTheDocument();
   });
 
-  it('should handle API errors gracefully', async () => {
-    server.use(
-      http.get('https://pokeapi.co/api/v2/pokemon', () => {
-        return new HttpResponse(null, { status: 500 });
-      })
-    );
+  it('should open the uncontrolled form modal when button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<HomePage />);
 
-    const PagePromise = HomePage({ searchParams: {} });
-    render(await PagePromise);
+    const uncontrolledButton = screen.getByRole('button', {
+      name: /open uncontrolled form/i,
+    });
+    await user.click(uncontrolledButton);
 
-    const clientComponent = screen.getByTestId('homepage-client');
-    const props = JSON.parse(
-      clientComponent.getAttribute('data-props') || '{}'
-    );
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Uncontrolled Form' })
+    ).toBeInTheDocument();
+  });
 
-    expect(props.initialData).toBeNull();
-    expect(props.initialError).not.toBeNull();
-    expect(props.initialError.message).toContain(
-      'Network response was not ok: 500'
-    );
+  it('should open the RHF form modal when button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<HomePage />);
+
+    const rhfButton = screen.getByRole('button', {
+      name: /open react hook form/i,
+    });
+    await user.click(rhfButton);
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'React Hook Form' })
+    ).toBeInTheDocument();
+  });
+
+  it('should display submitted data from the store', () => {
+    const mockFormData: StoredFormData[] = [
+      {
+        id: '1',
+        name: 'John Doe',
+        age: 30,
+        email: 'john@test.com',
+        country: 'USA',
+        gender: 'male',
+        picture: '',
+        password: 'password123',
+        terms: true,
+      },
+      {
+        id: '2',
+        name: 'Jane Doe',
+        age: 25,
+        email: 'jane@test.com',
+        country: 'Canada',
+        gender: 'female',
+        picture: '',
+        password: 'password456',
+        terms: true,
+      },
+    ];
+
+    act(() => {
+      useFormStore.setState({ formData: mockFormData });
+    });
+
+    render(<HomePage />);
+
+    expect(
+      screen.queryByText('No data submitted yet.')
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByText('Jane Doe')).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 4 })).toHaveLength(2);
   });
 });
