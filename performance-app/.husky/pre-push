@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "--- Husky: running tests before push ---"
+npm run test
