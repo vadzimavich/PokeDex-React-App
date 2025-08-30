@@ -1,4 +1,5 @@
 import { type Co2Data } from '../types/co2Data';
+import { getCo2DataFromDB, setCo2DataInDB } from './idbService';
 
 const DATA_URL =
   'https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.json';
@@ -73,6 +74,27 @@ const createSuspenseResource = <T>(promise: Promise<T>) => {
   };
 };
 
+const loadCo2Data = async (onProgress: ProgressCallback): Promise<Co2Data> => {
+  const cachedData = await getCo2DataFromDB();
+  if (cachedData) {
+    console.log('Data loaded from IndexedDB cache.');
+    onProgress(1, 1);
+    return cachedData;
+  }
+
+  console.log('Cache empty. Fetching data from network...');
+  const networkData = await fetchCo2DataWithProgress(onProgress);
+
+  try {
+    await setCo2DataInDB(networkData);
+    console.log('Data saved to IndexedDB cache.');
+  } catch (error) {
+    console.error('Failed to save data to IndexedDB:', error);
+  }
+
+  return networkData;
+};
+
 export const createCo2DataResource = (onProgress: ProgressCallback) => {
-  return createSuspenseResource(fetchCo2DataWithProgress(onProgress));
+  return createSuspenseResource(loadCo2Data(onProgress));
 };
