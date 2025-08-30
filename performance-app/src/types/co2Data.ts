@@ -14,4 +14,15 @@ export interface CountryEntry {
   data: YearData[];
 }
 
+export interface ProcessedCountry {
+  name: string;
+  isoCode: string;
+  region?: string;
+  latestPopulation: {
+    year: number;
+    value: number;
+  } | null;
+  data: YearData[];
+}
+
 export type Co2Data = Record<string, CountryEntry>;

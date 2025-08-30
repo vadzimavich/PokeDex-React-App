@@ -1,7 +1,9 @@
 import { Suspense, useState, useMemo, useRef } from 'react';
 import { createCo2DataResource } from './services/co2Service';
 import { type Co2Data } from './types/co2Data';
+import { processCo2Data } from './utils/dataProcessor';
 import LoadingSpinner from './components/LoadingSpinner/LoadingSpinner';
+import CountryList from './components/CountryList/CountryList';
 
 const Dashboard = ({
   resource,
@@ -9,21 +11,23 @@ const Dashboard = ({
   resource: ReturnType<typeof createCo2DataResource>;
 }) => {
   const co2Data: Co2Data = resource.read();
-  const countryCount = Object.keys(co2Data).length;
+
+  const processedCountries = processCo2Data(co2Data);
 
   return (
     <div>
-      <h1>CO2 Emissions Data</h1>
-      <p>Data loaded successfully for {countryCount} countries/regions.</p>
+      <h1>CO2 Emissions by Country</h1>
+      <p>Displaying data for {processedCountries.length} countries.</p>
+      <CountryList countries={processedCountries} />
     </div>
   );
 };
 
 function App() {
   const [progress, setProgress] = useState({ loaded: 0, total: 0 });
-
   const progressRef = useRef({ loaded: 0, total: 0 });
   const animationFrameId = useRef<number | null>(null);
+
   const resource = useMemo(() => {
     const onProgress = (loaded: number, total: number) => {
       progressRef.current = { loaded, total };
