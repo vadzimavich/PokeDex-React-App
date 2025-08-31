@@ -3,11 +3,15 @@ import styles from './CountryCard.module.css';
 
 interface CountryCardProps {
   country: ProcessedCountry;
+  isSelected: boolean;
+  onSelect: (isoCode: string) => void;
 }
 
-const CountryCard = ({ country }: CountryCardProps) => {
+const CountryCard = ({ country, isSelected, onSelect }: CountryCardProps) => {
+  const cardClasses = `${styles.card} ${isSelected ? styles.selected : ''}`;
+
   return (
-    <div className={styles.card}>
+    <div className={cardClasses} onClick={() => onSelect(country.isoCode)}>
       <h3 className={styles.name}>{country.name}</h3>
       <p className={styles.isoCode}>{country.isoCode}</p>
       <div className={styles.population}>
