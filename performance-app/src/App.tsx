@@ -20,7 +20,7 @@ function App() {
         if (animationFrameId.current === null) {
           animationFrameId.current = requestAnimationFrame(() => {
             setProgress(progressRef.current);
-          animationFrameId.current = null;
+            animationFrameId.current = null;
           });
         }
       };

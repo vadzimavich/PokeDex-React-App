@@ -28,11 +28,9 @@ export const getRegionMap = (): Promise<RegionMap> => {
           regionMap.set(country.cca3, country.region);
         }
       }
-      console.log('Region data loaded and processed.');
       return regionMap;
     })
-    .catch((error) => {
-      console.error('Could not load region data:', error);
+    .catch((_error) => {
       regionMapPromise = null;
       return new Map();
     });

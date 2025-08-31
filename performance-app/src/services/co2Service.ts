@@ -77,19 +77,17 @@ const createSuspenseResource = <T>(promise: Promise<T>) => {
 const loadCo2Data = async (onProgress: ProgressCallback): Promise<Co2Data> => {
   const cachedData = await getCo2DataFromDB();
   if (cachedData) {
-    console.log('Data loaded from IndexedDB cache.');
     onProgress(1, 1);
     return cachedData;
   }
 
-  console.log('Cache empty. Fetching data from network...');
   const networkData = await fetchCo2DataWithProgress(onProgress);
 
   try {
     await setCo2DataInDB(networkData);
     console.log('Data saved to IndexedDB cache.');
   } catch (error) {
-    console.error('Failed to save data to IndexedDB:', error);
+    // can ignore this error
   }
 
   return networkData;

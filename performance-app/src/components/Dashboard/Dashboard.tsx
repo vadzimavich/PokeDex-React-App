@@ -46,12 +46,10 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
   }, [selectedYear]);
 
   const baseCountries = useMemo(() => {
-    console.log('--- Recalculating BASE countries (on year change) ---');
     return processCo2Data(co2Data, selectedYear, regionMap);
   }, [co2Data, selectedYear, regionMap]);
 
   const displayedCountries = useMemo(() => {
-    console.log('--- Filtering and sorting DISPLAYED countries ---');
     let countries = baseCountries;
 
     if (selectedRegion !== 'All') {
