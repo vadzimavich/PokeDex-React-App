@@ -8,6 +8,7 @@ import { processCo2Data, getAllYears } from '../../utils/dataProcessor';
 import { getRegionMap, type RegionMap } from '../../services/regionService';
 import CountryList from '../CountryList/CountryList';
 import Controls from '../Controls/Controls';
+import ColumnSelectorModal from '../ColumnSelectorModal/ColumnSelectorModal';
 import styles from './Dashboard.module.css';
 
 type Co2Resource = {
@@ -28,6 +29,13 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('population_desc');
   const [selectedRegion, setSelectedRegion] = useState<string>('All');
+
+  const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([
+    'population',
+    'co2',
+    'co2_per_capita',
+  ]);
 
   useEffect(() => {
     getRegionMap().then(setRegionMap);
@@ -77,11 +85,27 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
 
   return (
     <div className={styles.dashboardContainer}>
+      {isColumnModalOpen && (
+        <ColumnSelectorModal
+          selectedColumns={selectedColumns}
+          onClose={() => setIsColumnModalOpen(false)}
+          onSave={setSelectedColumns}
+        />
+      )}
+
       <header className={styles.header}>
         <h1 className={styles.title}>CO₂ Emissions by Country</h1>
-        <button onClick={onReset} className={styles.resetButton}>
-          Reset Data Source
-        </button>
+        <div className={styles.headerActions}>
+          <button
+            onClick={() => setIsColumnModalOpen(true)}
+            className={styles.actionButton}
+          >
+            Edit Columns
+          </button>
+          <button onClick={onReset} className={styles.resetButton}>
+            Reset Data Source
+          </button>
+        </div>
       </header>
 
       <Controls
@@ -101,7 +125,7 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
         Displaying data for {processedCountries.length} countries.
       </p>
 
-      <CountryList countries={processedCountries} />
+      <CountryList countries={processedCountries} columns={selectedColumns} />
     </div>
   );
 };

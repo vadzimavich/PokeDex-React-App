@@ -1,12 +1,19 @@
+import { COLUMN_LABELS } from '../../constants/data';
 import { type YearData } from '../../types/co2Data';
 import styles from './YearlyDataTable.module.css';
 
 interface YearlyDataTableProps {
   data: YearData[];
+  columns: string[];
 }
 
-const YearlyDataTable = ({ data }: YearlyDataTableProps) => {
+const YearlyDataTable = ({ data, columns }: YearlyDataTableProps) => {
   const reversedData = [...data].reverse();
+
+  const formatValue = (value: number | undefined) => {
+    if (value === undefined || value === null) return 'N/A';
+    return value > 1000 ? value.toLocaleString() : value.toFixed(3);
+  };
 
   return (
     <div className={styles.tableContainer}>
@@ -14,18 +21,18 @@ const YearlyDataTable = ({ data }: YearlyDataTableProps) => {
         <thead>
           <tr>
             <th>Year</th>
-            <th>Population</th>
-            <th>CO₂ (total)</th>
-            <th>CO₂ (per capita)</th>
+            {columns.map((col) => (
+              <th key={col}>{COLUMN_LABELS[col] || col}</th>
+            ))}
           </tr>
         </thead>
         <tbody>
           {reversedData.map((yearData) => (
             <tr key={yearData.year}>
               <td>{yearData.year}</td>
-              <td>{yearData.population?.toLocaleString() ?? 'N/A'}</td>
-              <td>{yearData.co2?.toFixed(3) ?? 'N/A'}</td>
-              <td>{yearData.co2_per_capita?.toFixed(3) ?? 'N/A'}</td>
+              {columns.map((col) => (
+                <td key={col}>{formatValue(yearData[col])}</td>
+              ))}
             </tr>
           ))}
         </tbody>
