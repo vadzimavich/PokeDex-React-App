@@ -1,5 +1,6 @@
 import { type Co2Data } from '../../types/co2Data';
 import { processCo2Data } from '../../utils/dataProcessor';
+import Controls from '../Controls/Controls';
 import CountryList from '../CountryList/CountryList';
 import styles from './Dashboard.module.css';
 
@@ -24,6 +25,8 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
           Reset Data Source
         </button>
       </header>
+
+      <Controls />
 
       <p className={styles.summary}>
         Displaying data for {processedCountries.length} countries.
