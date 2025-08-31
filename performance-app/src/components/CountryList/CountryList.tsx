@@ -9,7 +9,7 @@ interface CountryListProps {
   columns: string[];
 }
 
-const CountryList = ({ countries, columns }: CountryListProps) => {
+const CountryListComponent = ({ countries, columns }: CountryListProps) => {
   const [selectedCountryIso, setSelectedCountryIso] = useState<string | null>(
     null
   );
@@ -42,5 +42,7 @@ const CountryList = ({ countries, columns }: CountryListProps) => {
     </div>
   );
 };
+
+const CountryList = React.memo(CountryListComponent);
 
 export default CountryList;

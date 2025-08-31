@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   type Co2Data,
   type SortKey,
@@ -22,14 +22,17 @@ interface DashboardProps {
 
 const Dashboard = ({ resource, onReset }: DashboardProps) => {
   const co2Data = resource.read();
-  const allYears = getAllYears(co2Data);
 
+  const allYears = useMemo(() => getAllYears(co2Data), [co2Data]);
   const [regionMap, setRegionMap] = useState<RegionMap>(new Map());
+  useEffect(() => {
+    getRegionMap().then(setRegionMap);
+  }, []);
+
   const [selectedYear, setSelectedYear] = useState<number>(allYears[0]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('population_desc');
   const [selectedRegion, setSelectedRegion] = useState<string>('All');
-
   const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([
     'population',
@@ -37,69 +40,84 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
     'co2_per_capita',
   ]);
 
-  useEffect(() => {
-    getRegionMap().then(setRegionMap);
-  }, []);
+  const processedCountries = useMemo(() => {
+    console.log('Recalculating processed countries...'); // Временный лог
+    let countries = processCo2Data(co2Data, selectedYear, regionMap);
 
-  let processedCountries = processCo2Data(co2Data, selectedYear, regionMap);
-
-  const uniqueRegions = [
-    ...new Set(processedCountries.map((c) => c.region).filter(Boolean)),
-  ].sort();
-  const allRegions = ['All', ...uniqueRegions] as string[];
-
-  if (selectedRegion !== 'All') {
-    processedCountries = processedCountries.filter(
-      (country) => country.region === selectedRegion
-    );
-  }
-
-  if (searchTerm) {
-    processedCountries = processedCountries.filter((country) =>
-      country.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }
-
-  processedCountries.sort((a: ProcessedCountry, b: ProcessedCountry) => {
-    switch (sortKey) {
-      case 'name_asc':
-        return a.name.localeCompare(b.name);
-      case 'name_desc':
-        return b.name.localeCompare(a.name);
-      case 'population_asc':
-        return (
-          (a.populationForYear?.value ?? 0) - (b.populationForYear?.value ?? 0)
-        );
-      case 'population_desc':
-      default:
-        return (
-          (b.populationForYear?.value ?? 0) - (a.populationForYear?.value ?? 0)
-        );
+    if (selectedRegion !== 'All') {
+      countries = countries.filter(
+        (country) => country.region === selectedRegion
+      );
     }
-  });
 
-  const handleYearChange = (year: number) => setSelectedYear(year);
-  const handleSearchChange = (term: string) => setSearchTerm(term);
-  const handleSortChange = (key: SortKey) => setSortKey(key);
-  const handleRegionChange = (region: string) => setSelectedRegion(region);
+    if (searchTerm) {
+      countries = countries.filter((country) =>
+        country.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    return [...countries].sort((a: ProcessedCountry, b: ProcessedCountry) => {
+      switch (sortKey) {
+        case 'name_asc':
+          return a.name.localeCompare(b.name);
+        case 'name_desc':
+          return b.name.localeCompare(a.name);
+        case 'population_asc':
+          return (
+            (a.populationForYear?.value ?? 0) -
+            (b.populationForYear?.value ?? 0)
+          );
+        case 'population_desc':
+        default:
+          return (
+            (b.populationForYear?.value ?? 0) -
+            (a.populationForYear?.value ?? 0)
+          );
+      }
+    });
+  }, [co2Data, selectedYear, regionMap, selectedRegion, searchTerm, sortKey]);
+
+  const allRegions = useMemo(() => {
+    const baseCountries = processCo2Data(co2Data, selectedYear, regionMap);
+    const uniqueRegions = [
+      ...new Set(baseCountries.map((c) => c.region).filter(Boolean)),
+    ].sort();
+    return ['All', ...uniqueRegions] as string[];
+  }, [co2Data, selectedYear, regionMap]);
+
+  const handleYearChange = useCallback(
+    (year: number) => setSelectedYear(year),
+    []
+  );
+  const handleSearchChange = useCallback(
+    (term: string) => setSearchTerm(term),
+    []
+  );
+  const handleSortChange = useCallback((key: SortKey) => setSortKey(key), []);
+  const handleRegionChange = useCallback(
+    (region: string) => setSelectedRegion(region),
+    []
+  );
+  const handleSaveColumns = useCallback(
+    (columns: string[]) => setSelectedColumns(columns),
+    []
+  );
+  const handleOpenModal = useCallback(() => setIsColumnModalOpen(true), []);
+  const handleCloseModal = useCallback(() => setIsColumnModalOpen(false), []);
 
   return (
     <div className={styles.dashboardContainer}>
       {isColumnModalOpen && (
         <ColumnSelectorModal
           selectedColumns={selectedColumns}
-          onClose={() => setIsColumnModalOpen(false)}
-          onSave={setSelectedColumns}
+          onClose={handleCloseModal}
+          onSave={handleSaveColumns}
         />
       )}
-
       <header className={styles.header}>
         <h1 className={styles.title}>CO₂ Emissions by Country</h1>
         <div className={styles.headerActions}>
-          <button
-            onClick={() => setIsColumnModalOpen(true)}
-            className={styles.actionButton}
-          >
+          <button onClick={handleOpenModal} className={styles.actionButton}>
             Edit Columns
           </button>
           <button onClick={onReset} className={styles.resetButton}>
@@ -107,7 +125,6 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
           </button>
         </div>
       </header>
-
       <Controls
         years={allYears}
         selectedYear={selectedYear}
@@ -120,11 +137,9 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
         selectedRegion={selectedRegion}
         onRegionChange={handleRegionChange}
       />
-
       <p className={styles.summary}>
         Displaying data for {processedCountries.length} countries.
       </p>
-
       <CountryList countries={processedCountries} columns={selectedColumns} />
     </div>
   );

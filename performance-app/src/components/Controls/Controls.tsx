@@ -1,3 +1,4 @@
+import React from 'react';
 import { type SortKey } from '../../types/co2Data';
 import styles from './Controls.module.css';
 
@@ -17,7 +18,7 @@ interface ControlsProps {
   onRegionChange: (region: string) => void;
 }
 
-const Controls = ({
+const ControlsComponent = ({
   years,
   selectedYear,
   onYearChange,
@@ -75,5 +76,7 @@ const Controls = ({
     </div>
   );
 };
+
+const Controls = React.memo(ControlsComponent);
 
 export default Controls;

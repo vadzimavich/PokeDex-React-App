@@ -1,3 +1,4 @@
+import React from 'react';
 import { COLUMN_LABELS } from '../../constants/data';
 import { type YearData } from '../../types/co2Data';
 import styles from './YearlyDataTable.module.css';
@@ -7,7 +8,7 @@ interface YearlyDataTableProps {
   columns: string[];
 }
 
-const YearlyDataTable = ({ data, columns }: YearlyDataTableProps) => {
+const YearlyDataTableComponent = ({ data, columns }: YearlyDataTableProps) => {
   const reversedData = [...data].reverse();
 
   const formatValue = (value: number | undefined) => {
@@ -40,5 +41,7 @@ const YearlyDataTable = ({ data, columns }: YearlyDataTableProps) => {
     </div>
   );
 };
+
+const YearlyDataTable = React.memo(YearlyDataTableComponent);
 
 export default YearlyDataTable;

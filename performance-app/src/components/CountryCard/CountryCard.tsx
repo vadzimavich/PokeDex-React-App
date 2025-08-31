@@ -1,3 +1,4 @@
+import React from 'react';
 import { type ProcessedCountry } from '../../types/co2Data';
 import styles from './CountryCard.module.css';
 
@@ -7,7 +8,13 @@ interface CountryCardProps {
   onSelect: (isoCode: string) => void;
 }
 
-const CountryCard = ({ country, isSelected, onSelect }: CountryCardProps) => {
+const CountryCardComponent = ({
+  country,
+  isSelected,
+  onSelect,
+}: CountryCardProps) => {
+  console.log(`Rendering CountryCard: ${country.name}`);
+
   const cardClasses = `${styles.card} ${isSelected ? styles.selected : ''}`;
 
   return (
@@ -28,5 +35,7 @@ const CountryCard = ({ country, isSelected, onSelect }: CountryCardProps) => {
     </div>
   );
 };
+
+const CountryCard = React.memo(CountryCardComponent);
 
 export default CountryCard;
