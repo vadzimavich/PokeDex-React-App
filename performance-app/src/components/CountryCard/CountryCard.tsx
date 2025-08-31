@@ -16,10 +16,10 @@ const CountryCard = ({ country, isSelected, onSelect }: CountryCardProps) => {
       <p className={styles.isoCode}>{country.isoCode}</p>
       <div className={styles.population}>
         <span className={styles.label}>Population:</span>
-        {country.latestPopulation ? (
+        {country.populationForYear ? (
           <span>
-            {country.latestPopulation.value.toLocaleString()}
-            <small> (in {country.latestPopulation.year})</small>
+            {country.populationForYear.value.toLocaleString()}
+            <small> (in {country.populationForYear.year})</small>
           </span>
         ) : (
           <span>N/A</span>

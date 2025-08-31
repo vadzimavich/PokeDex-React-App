@@ -1,6 +1,12 @@
 import styles from './Controls.module.css';
 
-const Controls = () => {
+interface ControlsProps {
+  years: number[];
+  selectedYear: number;
+  onYearChange: (year: number) => void;
+}
+
+const Controls = ({ years, selectedYear, onYearChange }: ControlsProps) => {
   return (
     <div className={styles.controlsContainer}>
       <input
@@ -18,8 +24,16 @@ const Controls = () => {
         <select className={styles.select}>
           <option value="">Filter by Region</option>
         </select>
-        <select className={styles.select}>
-          <option value="">Select Year</option>
+        <select
+          className={styles.select}
+          value={selectedYear}
+          onChange={(e) => onYearChange(Number(e.target.value))}
+        >
+          {years.map((year) => (
+            <option key={year} value={year}>
+              Year: {year}
+            </option>
+          ))}
         </select>
       </div>
     </div>

@@ -18,7 +18,7 @@ export interface ProcessedCountry {
   name: string;
   isoCode: string;
   region?: string;
-  latestPopulation: {
+  populationForYear: {
     year: number;
     value: number;
   } | null;

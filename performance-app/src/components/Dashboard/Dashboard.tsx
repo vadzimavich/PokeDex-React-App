@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { type Co2Data } from '../../types/co2Data';
-import { processCo2Data } from '../../utils/dataProcessor';
-import Controls from '../Controls/Controls';
+import { processCo2Data, getAllYears } from '../../utils/dataProcessor';
 import CountryList from '../CountryList/CountryList';
+import Controls from '../Controls/Controls';
 import styles from './Dashboard.module.css';
 
 type Co2Resource = {
@@ -15,7 +16,16 @@ interface DashboardProps {
 
 const Dashboard = ({ resource, onReset }: DashboardProps) => {
   const co2Data = resource.read();
-  const processedCountries = processCo2Data(co2Data);
+
+  const allYears = getAllYears(co2Data);
+
+  const [selectedYear, setSelectedYear] = useState<number>(allYears[0]);
+
+  const processedCountries = processCo2Data(co2Data, selectedYear);
+
+  const handleYearChange = (year: number) => {
+    setSelectedYear(year);
+  };
 
   return (
     <div className={styles.dashboardContainer}>
@@ -26,7 +36,11 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
         </button>
       </header>
 
-      <Controls />
+      <Controls
+        years={allYears}
+        selectedYear={selectedYear}
+        onYearChange={handleYearChange}
+      />
 
       <p className={styles.summary}>
         Displaying data for {processedCountries.length} countries.
