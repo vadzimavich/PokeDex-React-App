@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { type ProcessedCountry } from '../../types/co2Data';
 import CountryCard from '../CountryCard/CountryCard';
 import YearlyDataTable from '../YearlyDataTable/YearlyDataTable';
@@ -7,16 +7,21 @@ import styles from './CountryList.module.css';
 interface CountryListProps {
   countries: ProcessedCountry[];
   columns: string[];
+  highlightKey: number;
 }
 
-const CountryListComponent = ({ countries, columns }: CountryListProps) => {
+const CountryListComponent = ({
+  countries,
+  columns,
+  highlightKey,
+}: CountryListProps) => {
   const [selectedCountryIso, setSelectedCountryIso] = useState<string | null>(
     null
   );
 
-  const handleSelectCountry = (isoCode: string) => {
+  const handleSelectCountry = useCallback((isoCode: string) => {
     setSelectedCountryIso((prev) => (prev === isoCode ? null : isoCode));
-  };
+  }, []);
 
   const selectedCountryData = selectedCountryIso
     ? countries.find((c) => c.isoCode === selectedCountryIso)
@@ -25,7 +30,7 @@ const CountryListComponent = ({ countries, columns }: CountryListProps) => {
   return (
     <div className={styles.grid}>
       {countries.map((country) => (
-        <React.Fragment key={country.isoCode}>
+        <React.Fragment key={`${country.isoCode}-${highlightKey}`}>
           <CountryCard
             country={country}
             isSelected={country.isoCode === selectedCountryIso}

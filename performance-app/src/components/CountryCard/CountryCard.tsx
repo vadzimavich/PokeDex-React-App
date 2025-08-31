@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { type ProcessedCountry } from '../../types/co2Data';
 import styles from './CountryCard.module.css';
 
@@ -13,9 +13,17 @@ const CountryCardComponent = ({
   isSelected,
   onSelect,
 }: CountryCardProps) => {
-  console.log(`Rendering CountryCard: ${country.name}`);
+  const [isHighlighted, setIsHighlighted] = useState(true);
 
-  const cardClasses = `${styles.card} ${isSelected ? styles.selected : ''}`;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsHighlighted(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const cardClasses = `${styles.card} ${isSelected ? styles.selected : ''} ${isHighlighted ? styles.highlight : ''}`;
 
   return (
     <div className={cardClasses} onClick={() => onSelect(country.isoCode)}>

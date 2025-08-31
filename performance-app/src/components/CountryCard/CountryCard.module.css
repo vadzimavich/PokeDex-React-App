@@ -45,3 +45,14 @@
   box-shadow: 0 0 0 2px var(--color-primary);
   transform: translateY(-4px);
 }
+
+.highlight {
+  animation: flash var(--transition-medium);
+}
+
+@keyframes flash {
+  50% {
+    background-color: rgba(100, 108, 255, 0.3); 
+    border-color: var(--color-primary);
+  }
+}

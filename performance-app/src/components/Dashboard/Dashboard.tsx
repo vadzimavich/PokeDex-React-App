@@ -25,10 +25,6 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
 
   const allYears = useMemo(() => getAllYears(co2Data), [co2Data]);
   const [regionMap, setRegionMap] = useState<RegionMap>(new Map());
-  useEffect(() => {
-    getRegionMap().then(setRegionMap);
-  }, []);
-
   const [selectedYear, setSelectedYear] = useState<number>(allYears[0]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('population_desc');
@@ -39,23 +35,35 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
     'co2',
     'co2_per_capita',
   ]);
+  const [highlightKey, setHighlightKey] = useState(0);
 
-  const processedCountries = useMemo(() => {
-    console.log('Recalculating processed countries...'); // Временный лог
-    let countries = processCo2Data(co2Data, selectedYear, regionMap);
+  useEffect(() => {
+    getRegionMap().then(setRegionMap);
+  }, []);
+
+  useEffect(() => {
+    setHighlightKey((key) => key + 1);
+  }, [selectedYear]);
+
+  const baseCountries = useMemo(() => {
+    console.log('--- Recalculating BASE countries (on year change) ---');
+    return processCo2Data(co2Data, selectedYear, regionMap);
+  }, [co2Data, selectedYear, regionMap]);
+
+  const displayedCountries = useMemo(() => {
+    console.log('--- Filtering and sorting DISPLAYED countries ---');
+    let countries = baseCountries;
 
     if (selectedRegion !== 'All') {
       countries = countries.filter(
         (country) => country.region === selectedRegion
       );
     }
-
     if (searchTerm) {
       countries = countries.filter((country) =>
         country.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     return [...countries].sort((a: ProcessedCountry, b: ProcessedCountry) => {
       switch (sortKey) {
         case 'name_asc':
@@ -75,15 +83,14 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
           );
       }
     });
-  }, [co2Data, selectedYear, regionMap, selectedRegion, searchTerm, sortKey]);
+  }, [baseCountries, selectedRegion, searchTerm, sortKey]);
 
   const allRegions = useMemo(() => {
-    const baseCountries = processCo2Data(co2Data, selectedYear, regionMap);
     const uniqueRegions = [
       ...new Set(baseCountries.map((c) => c.region).filter(Boolean)),
     ].sort();
     return ['All', ...uniqueRegions] as string[];
-  }, [co2Data, selectedYear, regionMap]);
+  }, [baseCountries]);
 
   const handleYearChange = useCallback(
     (year: number) => setSelectedYear(year),
@@ -138,9 +145,13 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
         onRegionChange={handleRegionChange}
       />
       <p className={styles.summary}>
-        Displaying data for {processedCountries.length} countries.
+        Displaying data for {displayedCountries.length} countries.
       </p>
-      <CountryList countries={processedCountries} columns={selectedColumns} />
+      <CountryList
+        countries={displayedCountries}
+        columns={selectedColumns}
+        highlightKey={highlightKey}
+      />
     </div>
   );
 };
