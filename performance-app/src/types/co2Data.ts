@@ -25,4 +25,10 @@ export interface ProcessedCountry {
   data: YearData[];
 }
 
+export type SortKey =
+  | 'population_desc'
+  | 'population_asc'
+  | 'name_asc'
+  | 'name_desc';
+
 export type Co2Data = Record<string, CountryEntry>;
