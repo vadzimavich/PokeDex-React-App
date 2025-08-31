@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   type Co2Data,
   type SortKey,
   type ProcessedCountry,
 } from '../../types/co2Data';
 import { processCo2Data, getAllYears } from '../../utils/dataProcessor';
+import { getRegionMap, type RegionMap } from '../../services/regionService';
 import CountryList from '../CountryList/CountryList';
 import Controls from '../Controls/Controls';
 import styles from './Dashboard.module.css';
@@ -22,11 +23,28 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
   const co2Data = resource.read();
   const allYears = getAllYears(co2Data);
 
+  const [regionMap, setRegionMap] = useState<RegionMap>(new Map());
   const [selectedYear, setSelectedYear] = useState<number>(allYears[0]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('population_desc');
+  const [selectedRegion, setSelectedRegion] = useState<string>('All');
 
-  let processedCountries = processCo2Data(co2Data, selectedYear);
+  useEffect(() => {
+    getRegionMap().then(setRegionMap);
+  }, []);
+
+  let processedCountries = processCo2Data(co2Data, selectedYear, regionMap);
+
+  const uniqueRegions = [
+    ...new Set(processedCountries.map((c) => c.region).filter(Boolean)),
+  ].sort();
+  const allRegions = ['All', ...uniqueRegions] as string[];
+
+  if (selectedRegion !== 'All') {
+    processedCountries = processedCountries.filter(
+      (country) => country.region === selectedRegion
+    );
+  }
 
   if (searchTerm) {
     processedCountries = processedCountries.filter((country) =>
@@ -55,6 +73,7 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
   const handleYearChange = (year: number) => setSelectedYear(year);
   const handleSearchChange = (term: string) => setSearchTerm(term);
   const handleSortChange = (key: SortKey) => setSortKey(key);
+  const handleRegionChange = (region: string) => setSelectedRegion(region);
 
   return (
     <div className={styles.dashboardContainer}>
@@ -73,6 +92,9 @@ const Dashboard = ({ resource, onReset }: DashboardProps) => {
         onSearchChange={handleSearchChange}
         sortKey={sortKey}
         onSortChange={handleSortChange}
+        regions={allRegions}
+        selectedRegion={selectedRegion}
+        onRegionChange={handleRegionChange}
       />
 
       <p className={styles.summary}>

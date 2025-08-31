@@ -11,6 +11,10 @@ interface ControlsProps {
 
   sortKey: SortKey;
   onSortChange: (key: SortKey) => void;
+
+  regions: string[];
+  selectedRegion: string;
+  onRegionChange: (region: string) => void;
 }
 
 const Controls = ({
@@ -21,6 +25,9 @@ const Controls = ({
   onSearchChange,
   sortKey,
   onSortChange,
+  regions,
+  selectedRegion,
+  onRegionChange,
 }: ControlsProps) => {
   return (
     <div className={styles.controlsContainer}>
@@ -42,8 +49,16 @@ const Controls = ({
           <option value="name_asc">Sort by Name (A-Z)</option>
           <option value="name_desc">Sort by Name (Z-A)</option>
         </select>
-        <select className={styles.select}>
-          <option value="">Filter by Region</option>
+        <select
+          className={styles.select}
+          value={selectedRegion}
+          onChange={(e) => onRegionChange(e.target.value)}
+        >
+          {regions.map((region) => (
+            <option key={region} value={region}>
+              {region === 'All' ? 'All Regions' : region}
+            </option>
+          ))}
         </select>
         <select
           className={styles.select}

@@ -1,3 +1,4 @@
+import { type RegionMap } from '../services/regionService';
 import {
   type Co2Data,
   type ProcessedCountry,
@@ -21,7 +22,8 @@ const findPopulationByYear = (
 
 export const processCo2Data = (
   rawData: Co2Data,
-  selectedYear: number
+  selectedYear: number,
+  regionMap: RegionMap
 ): ProcessedCountry[] => {
   const processedCountries: ProcessedCountry[] = [];
 
@@ -33,10 +35,12 @@ export const processCo2Data = (
         countryData.data,
         selectedYear
       );
+      const region = regionMap.get(countryData.iso_code) || 'Other';
 
       processedCountries.push({
         name: countryName,
         isoCode: countryData.iso_code,
+        region,
         populationForYear,
         data: countryData.data,
       });
