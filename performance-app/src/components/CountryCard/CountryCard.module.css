@@ -1,0 +1,58 @@
+.card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-lg);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--color-primary);
+}
+
+.name {
+  font-size: 1.25rem;
+  margin-bottom: var(--space-xs);
+  color: var(--color-text);
+}
+
+.isoCode {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-md);
+}
+
+.population {
+  font-size: 1rem;
+}
+
+.population .label {
+  font-weight: 600;
+  margin-right: var(--space-sm);
+}
+
+.population small {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary);
+  transform: translateY(-4px);
+}
+
+.highlight {
+  animation: flash var(--transition-medium);
+}
+
+@keyframes flash {
+  50% {
+    background-color: rgba(100, 108, 255, 0.3); 
+    border-color: var(--color-primary);
+  }
+}
