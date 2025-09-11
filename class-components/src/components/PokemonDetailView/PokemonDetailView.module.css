@@ -1,0 +1,121 @@
+.detailsView {
+  width: 40%;
+  max-width: 500px;
+  min-width: 350px;
+  padding: 2rem;
+  border-left: 1px solid #444;
+  position: relative;
+  text-transform: capitalize;
+  background-color: #242424;
+  overflow-y: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2.5rem;
+  line-height: 1;
+  color: white;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.closeButton:hover {
+  opacity: 1;
+}
+
+.image {
+  width: 80%;
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.name {
+  font-size: 2rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.id {
+  font-size: 1.2rem;
+  color: #888;
+}
+
+.types {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.description {
+  font-size: 0.9rem;
+  color: #ddd;
+  text-transform: none;
+  line-height: 1.5;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.statsContainer {
+  width: 100%;
+  background-color: #2c2c2c;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.statsContainer h3 {
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+.statsContainer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.statItem {
+  display: grid;
+  grid-template-columns: 120px 40px 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.statName {
+  text-align: right;
+  color: #aaa;
+}
+
+.statValue {
+  font-weight: bold;
+}
+
+.statBar {
+  width: 100%;
+  height: 8px;
+  background-color: #444;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.statBarFill {
+  height: 100%;
+  background-color: #646cff;
+  border-radius: 4px;
+  transition: width 0.5s;
+}

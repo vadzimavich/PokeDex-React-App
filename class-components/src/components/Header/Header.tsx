@@ -1,22 +1,16 @@
-import { Component } from 'react';
 import Search from '../Search/Search';
 
 interface HeaderProps {
   onSearch: (searchTerm: string) => void;
-  searchTerm: string;
+  initialValue: string;
 }
 
-class Header extends Component<HeaderProps> {
-  render() {
-    return (
-      <header className="header">
-        <Search
-          onSearch={this.props.onSearch}
-          initialValue={this.props.searchTerm}
-        />
-      </header>
-    );
-  }
-}
+const Header = ({ onSearch, initialValue }: HeaderProps) => {
+  return (
+    <header className="header">
+      <Search onSearch={onSearch} initialValue={initialValue} />
+    </header>
+  );
+};
 
 export default Header;
