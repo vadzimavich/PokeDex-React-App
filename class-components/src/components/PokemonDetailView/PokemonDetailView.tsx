@@ -1,40 +1,18 @@
-import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { getPokemonFullDetails } from '../../api/pokemonService';
-import type { PokemonDetails } from '../../types';
 import styles from './PokemonDetailView.module.css';
 import cardStyles from '../Card/Card.module.css';
+import { useGetPokemonDetails } from '../../hooks/useGetPokemonDetails';
 
 const PokemonDetailView = () => {
-  const [pokemon, setPokemon] = useState<PokemonDetails | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
   const { pokemonId } = useParams<{ pokemonId: string }>();
+  const { pokemon, isLoading, error } = useGetPokemonDetails(pokemonId);
+
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleClose = () => {
     navigate(`/${location.search}`);
   };
-
-  useEffect(() => {
-    if (pokemonId) {
-      const fetchDetails = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-          const data = await getPokemonFullDetails(pokemonId);
-          setPokemon(data);
-        } catch (err) {
-          setError(err as Error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      fetchDetails();
-    }
-  }, [pokemonId]);
 
   return (
     <aside className={styles.detailsView}>
