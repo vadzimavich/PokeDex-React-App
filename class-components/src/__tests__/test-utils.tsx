@@ -14,7 +14,7 @@ export const renderWithRouter = (ui: ReactElement, { route = '/' } = {}) => {
 export const createPokemonDetailsMock = (
   id: number,
   name: string
-): Partial<PokemonDetails> => ({
+): PokemonDetails => ({
   id,
   name,
   species: { url: `https://pokeapi.co/api/v2/pokemon-species/${id}/` },
@@ -24,4 +24,5 @@ export const createPokemonDetailsMock = (
   abilities: [],
   height: 10,
   weight: 100,
+  description: `A mock description for ${name}.`,
 });

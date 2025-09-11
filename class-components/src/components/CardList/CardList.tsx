@@ -8,7 +8,7 @@ interface CardListProps {
 }
 
 const CardList = ({ pokemons, onCardClick }: CardListProps) => {
-  if (pokemons.length === 0) {
+  if (!pokemons.length) {
     return <div>No Pokemon found.</div>;
   }
 
