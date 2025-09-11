@@ -1,9 +1,8 @@
-import { useContext } from 'react';
-import { ThemeContext } from '../../contexts/theme';
+import { useTheme } from '../../contexts/theme';
 import styles from './ThemeSwitch.module.css';
 
 const ThemeSwitch = () => {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <button
