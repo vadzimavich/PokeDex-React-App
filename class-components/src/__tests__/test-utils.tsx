@@ -4,19 +4,21 @@ import { MemoryRouter } from 'react-router-dom';
 import { type ReactElement } from 'react';
 import { ThemeProvider } from '../contexts/ThemeContext';
 
-const AppProviders = ({ children }: { children: React.ReactNode }) => {
+const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return <ThemeProvider>{children}</ThemeProvider>;
 };
 
 const customRender = (
   ui: ReactElement,
   options?: Omit<RenderOptions, 'wrapper'>
-) => render(ui, { wrapper: AppProviders, ...options });
+) => render(ui, { wrapper: AllTheProviders, ...options });
 
 export const renderWithRouter = (ui: ReactElement, { route = '/' } = {}) => {
   return render(ui, {
     wrapper: ({ children }) => (
-      <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+      <ThemeProvider>
+        <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+      </ThemeProvider>
     ),
   });
 };
