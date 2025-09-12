@@ -1,12 +1,19 @@
 import styles from './Flyout.module.css';
+import { useSelectedItemsStore } from '../../store/selectedItemsStore';
+import { convertToCSV, downloadCSV } from '../../utils/csvConverter';
 
-interface FlyoutProps {
-  selectedCount: number;
-  onUnselectAll: () => void;
-  onDownload: () => void;
-}
+const Flyout = () => {
+  const { selectedPokemons, unselectAll } = useSelectedItemsStore();
+  const selectedCount = selectedPokemons.length;
 
-const Flyout = ({ selectedCount, onUnselectAll, onDownload }: FlyoutProps) => {
+  const handleDownload = () => {
+    if (selectedCount === 0) return;
+
+    const csvData = convertToCSV(selectedPokemons);
+    const fileName = `${selectedCount}_pokemons.csv`;
+    downloadCSV(csvData, fileName);
+  };
+
   if (selectedCount === 0) {
     return null;
   }
@@ -17,10 +24,10 @@ const Flyout = ({ selectedCount, onUnselectAll, onDownload }: FlyoutProps) => {
         {selectedCount} {selectedCount === 1 ? 'item' : 'items'} selected
       </span>
       <div className={styles.actions}>
-        <button className={styles.unselectButton} onClick={onUnselectAll}>
+        <button className={styles.unselectButton} onClick={unselectAll}>
           Unselect all
         </button>
-        <button className={styles.downloadButton} onClick={onDownload}>
+        <button className={styles.downloadButton} onClick={handleDownload}>
           Download
         </button>
       </div>
